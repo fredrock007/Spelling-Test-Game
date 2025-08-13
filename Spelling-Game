@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Vocabulary Games – Hangman + 30 Seconds</title>
+<style>
+  :root{
+    --bg:#0b132b; --panel:#121e36; --accent:#5bc0be; --accent2:#fca311; --good:#2ecc71; --bad:#e74c3c; --text:#e6eef5;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Inter,Roboto,Arial}
+  .wrap{max-width:1100px;margin:0 auto;padding:16px}
+  header{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  h1{font-size:22px;margin:0}
+  .tabs{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .tab-btn{border:0;padding:10px 14px;border-radius:12px;background:#1e2a46;color:#cfe7ff;cursor:pointer}
+  .tab-btn.active{background:var(--accent);color:#062531;font-weight:700}
+  .card{background:var(--panel);border:1px solid #1e2a46;border-radius:16px;padding:16px;box-shadow:0 6px 22px rgba(0,0,0,.25)}
+  .flex{display:flex;gap:14px;flex-wrap:wrap}
+  .grow{flex:1 1 360px}
+  .muted{opacity:.8}
+  .btn{border:0;background:var(--accent);color:#062531;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:700}
+  .btn.secondary{background:#1e2a46;color:#cfe7ff}
+  .btn.warn{background:var(--accent2);color:#130a00}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .kbd{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:12px}
+  .key{background:#17233f;border:1px solid #1f335d;border-radius:10px;padding:10px 0;text-align:center;font-weight:700;cursor:pointer}
+  .key.used{opacity:.4;pointer-events:none}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .slots{letter-spacing:.28em;font-size:26px;margin:10px 0 6px;white-space:pre}
+  .lives{font-weight:700}
+  .hint{background:#0f1a31;border-left:4px solid var(--accent);padding:10px;border-radius:10px}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#1e2a46;color:#cfe7ff;font-size:12px}
+  .score{font-size:18px;font-weight:800}
+  .big{font-size:20px}
+  input[type="text"]{width:100%;padding:12px;border-radius:12px;border:1px solid #213152;background:#0f1a31;color:#e6eef5;font-size:16px}
+  .def-box{font-size:18px;line-height:1.45}
+  .good{color:var(--good)}
+  .bad{color:var(--bad)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#101a31;border:1px solid #20325b;color:#dff3ff;padding:10px 14px;border-radius:999px;opacity:0;transition:opacity .2s, transform .2s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+  @media (max-width:480px){ .kbd{grid-template-columns:repeat(7,1fr)} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Vocabulary Games</h1>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="hangman">Hangman</button>
+      <button class="tab-btn" data-tab="seconds">30 Seconds (Definitions)</button>
+    </div>
+  </header>
+
+  <!-- Hangman -->
+  <section id="hangman" class="card">
+    <div class="flex">
+      <div class="grow">
+        <div class="row">
+          <span class="pill">Topic: Post-apartheid themes</span>
+          <span class="pill">Lives: <span id="lives" class="lives">7</span></span>
+          <span class="pill">Wins: <span id="wins">0</span></span>
+        </div>
+        <div id="slots" class="slots">_ _ _ _ _</div>
+        <div id="used" class="muted">Used: —</div>
+        <div class="row" style="margin-top:8px">
+          <button id="btnHint" class="btn secondary">Show Hint</button>
+          <button id="btnNew" class="btn">New Word</button>
+          <button id="btnReveal" class="btn warn">Reveal</button>
+        </div>
+        <div id="hint" class="hint" style="margin-top:10px;display:none"></div>
+        <div id="result" class="big" style="margin-top:8px"></div>
+      </div>
+      <div class="grow">
+        <div class="kbd" id="keyboard"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 30 Seconds -->
+  <section id="seconds" class="card" style="display:none">
+    <div class="row" style="justify-content:space-between">
+      <div class="score">Round Score: <span id="secScore">0</span></div>
+      <div class="score">Time: <span id="secTime">30</span>s</div>
+    </div>
+    <div id="defBox" class="def-box" style="margin:10px 0 8px"></div>
+    <input id="secInput" type="text" placeholder="Type the word here…" autocomplete="off" />
+    <div class="row" style="margin-top:10px">
+      <button id="secStart" class="btn">Start 30-second Round</button>
+      <button id="secSkip" class="btn secondary" disabled>Skip</button>
+      <button id="secGive" class="btn warn" disabled>Give Answer</button>
+      <span class="pill">Correct total: <span id="secTotal">0</span></span>
+    </div>
+    <div id="secFeedback" class="big" style="margin-top:8px"></div>
+    <div id="secLast" class="muted" style="margin-top:6px"></div>
+  </section>
+</div>
+
+<div class="toast" id="toast">Saved</div>
+
+<!-- Sound Effects -->
+<audio id="sndCorrect" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEA..."></audio>
+<audio id="sndWrong"   src="data:audio/wav;base64,UklGRpQAAABXQVZFZm10IBAAAAABAAEA..."></audio>
+<audio id="sndLose"    src="data:audio/wav;base64,UklGRnIAAABXQVZFZm10IBAAAAABAAEA..."></audio>
+<audio id="sndWin"     src="data:audio/wav;base64,UklGRi4AAABXQVZFZm10IBAAAAABAAEA..."></audio>
+<audio id="sndTimeUp"  src="data:audio/wav;base64,UklGRn4AAABXQVZFZm10IBAAAAABAAEA..."></audio>
+
+<script>
+/* Sounds helper */
+const playSound = id => { const el = document.getElementById(id); el.currentTime=0; el.play(); };
+
+/* ----------------- Data ------------------ */
+const TERMS = [
+  {w:"reconciliation", d:"The restoration of friendly relations."},
+  {w:"apartheid", d:"A system of institutionalised racial segregation."},
+  {w:"liberation", d:"Freedom from oppression."},
+  {w:"truth", d:"The quality or state of being true."},
+  {w:"conflict", d:"A serious disagreement or argument."},
+  {w:"legacy", d:"What is left behind or remembered."},
+  {w:"respect", d:"A feeling of admiration for someone or something."},
+  {w:"betrayal", d:"Disloyalty or treachery."},
+  {w:"tension", d:"Mental or emotional strain."},
+  {w:"resentment", d:"Bitter indignation at being treated unfairly."},
+  {w:"identity", d:"Who someone is; the sense of self."},
+  {w:"responsibility", d:"A duty to deal with something or someone."},
+  {w:"honesty", d:"Being truthful and sincere."},
+  {w:"justice", d:"Fair treatment or behaviour."},
+  {w:"funeral", d:"A ceremony to honour the dead."},
+  {w:"exile", d:"Being banned from one’s country."},
+  {w:"dialogue", d:"A conversation between two or more people."},
+  {w:"sacrifice", d:"Giving something up for a cause or others."},
+  {w:"repression", d:"The action of subduing someone by force."},
+  {w:"forgiveness", d:"The action of forgiving someone for a mistake or wrongdoing."}
+];
+
+const $ = id => document.getElementById(id);
+const toast = msg => { const t = $("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 1200); };
+const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
+
+/* Tabs */
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab = btn.dataset.tab;
+    document.querySelectorAll("section").forEach(s=>s.style.display="none");
+    $(tab).style.display="";
+  });
+});
+
+/* Hangman */
+let hmWord="", hmMasked=[], hmLives=7, hmUsed=new Set(), hmHint="", hmWins=0;
+const drawKeyboard=()=>{
+  const keys="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), kb=$("keyboard"); kb.innerHTML="";
+  keys.forEach(k=>{
+    const div=document.createElement("button"); div.className="key"; div.textContent=k;
+    div.addEventListener("click", ()=>guess(k));
+    kb.appendChild(div);
+  });
+};
+const newWord=()=>{
+  const {w,d}=TERMS[Math.floor(Math.random()*TERMS.length)];
+  hmWord=w.toUpperCase(); hmHint=d; hmMasked=hmWord.split("").map(ch=>(/[A-Z]/.test(ch)?"_":ch));
+  hmLives=7; hmUsed=new Set();
+  $("slots").textContent=hmMasked.join(" "); $("lives").textContent=hmLives; $("used").textContent="Used: —";
+  $("hint").style.display="none"; $("hint").textContent="Hint: "+hmHint; $("result").textContent="";
+  document.querySelectorAll(".key").forEach(k=>k.classList.remove("used"));
+};
+const reveal=()=>{ $("slots").textContent=hmWord.split("").join(" "); $("result").innerHTML=`Answer: <b>${hmWord}</b>`; };
+const guess=letter=>{
+  if(hmLives<=0) return;
+  if(hmUsed.has(letter)) return;
+  hmUsed.add(letter);
+  document.querySelectorAll(".key").forEach(k=>{ if(k.textContent===letter) k.classList.add("used"); });
+  $("used").textContent="Used: "+[...hmUsed].join(" ");
+  if(hmWord.includes(letter)){
+    hmWord.split("").forEach((ch,i)=>{ if(ch===letter) hmMasked[i]=letter; });
+    $("slots").textContent=hmMasked.join(" ");
+    playSound("sndCorrect");
+    if(!hmMasked.includes("_")){ $("result").innerHTML=`<span class="good">Great! You solved it.</span>`; hmWins++; $("wins").textContent=hmWins; playSound("sndWin"); toast("Win +1"); }
+  }else{
+    hmLives--; $("lives").textContent=hmLives; playSound("sndWrong");
+    if(hmLives<=0){ $("result").innerHTML=`<span class="bad">Out of lives!</span> The word was <b>${hmWord}</b>.`; playSound("sndLose"); toast("Round over"); }
+  }
+};
+drawKeyboard(); newWord();
+$("btnHint").onclick=()=>{$("hint").style.display=$("hint").style.display==="none"?"": "none";};
+$("btnNew").onclick=()=>{ newWord(); };
+$("btnReveal").onclick=()=>{ reveal(); };
+window.addEventListener("keydown",e=>{ if($("hangman").style.display==="none") return; const L=e.key.toUpperCase(); if(L>="A"&&L<="Z") guess(L); });
+
+/* 30 Seconds */
+let secRoundActive=false, secTime=30, secTimer=null, secScore=0, secTotal=0, secQueue=[], secCurrent=null;
+const secondsReset=()=>{ secRoundActive=false; secTime=30; secScore=0; secQueue=shuffle(TERMS.slice()); secCurrent=null; clearInterval(secTimer);
+  $("secTime").textContent=secTime; $("secScore").textContent=0; $("secFeedback").textContent=""; $("secInput").value=""; $("secInput").disabled=true;
+  $("secSkip").disabled=true; $("secGive").disabled=true; $("defBox").innerHTML="Press <b>Start 30-second Round</b> to begin."; };
+const nextDefinition=()=>{ if(secQueue.length===0) secQueue=shuffle(TERMS.slice()); secCurrent=secQueue.pop(); $("defBox").innerHTML=`<b>Definition:</b> ${secCurrent.d}`; $("secInput").value=""; $("secInput").focus(); };
+const startRound=()=>{ if(secRoundActive) return; secondsReset(); secRoundActive=true; $("secInput").disabled=false; $("secSkip").disabled=false; $("secGive").disabled=false; nextDefinition();
+  secTimer=setInterval(()=>{ secTime--; $("secTime").textContent=secTime; if(secTime<=0){ endRound(); playSound("sndTimeUp"); } },1000); };
+const endRound=()=>{ clearInterval(secTimer); secRoundActive=false; $("secInput").disabled=true; $("secSkip").disabled=true; $("secGive").disabled=true; $("secFeedback").innerHTML=`⏱️ Round over. You scored <b>${secScore}</b>.`; $("secLast").innerHTML=""; toast("Round finished"); };
+$("secStart").onclick=startRound;
+$("secSkip").onclick=()=>{ if(!secRoundActive) return; $("secLast").innerHTML=`Skipped: <b>${secCurrent.w}</b>`; nextDefinition(); };
+$("secGive").onclick=()=>{ if(!secRoundActive) return; $("secLast").innerHTML=`Answer: <b>${secCurrent.w}</b>`; nextDefinition(); };
+$("secInput").addEventListener("keydown",e=>{ if(e.key==="Enter"){ const guess=e.target.value.trim().toLowerCase(); if(!guess) return;
+  if(guess===secCurrent.w.toLowerCase()){ secScore++; secTotal++; $("secScore").textContent=secScore; $("secTotal").textContent=secTotal; $("secFeedback").innerHTML=`<span class="good">Correct!</span>`; playSound("sndCorrect"); nextDefinition();
+  }else{ $("secFeedback").innerHTML=`<span class="bad">Try again.</span>`; playSound("sndWrong"); } } });
+secondsReset();
+</script>
+</body>
+</html>
