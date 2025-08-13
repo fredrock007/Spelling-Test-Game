@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Vocabulary Games – Hangman + 30 Seconds + Millionaire + Study</title>
+<title>Vocabulary Games – Hangman (Stickman) + 30 Seconds</title>
 <style>
   :root{
     --bg:#0b132b; --panel:#121e36; --accent:#5bc0be; --accent2:#fca311;
@@ -11,7 +11,7 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Inter,Roboto,Arial}
-  .wrap{max-width:1200px;margin:0 auto;padding:16px}
+  .wrap{max-width:1100px;margin:0 auto;padding:16px}
   header{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
   h1{font-size:22px;margin:0}
   .tabs{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
@@ -29,7 +29,6 @@
   .key{background:#17233f;border:1px solid #1f335d;border-radius:10px;padding:10px 0;text-align:center;font-weight:700;cursor:pointer}
   .key.used{opacity:.4;pointer-events:none}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .col{display:flex;flex-direction:column;gap:8px}
   .slots{letter-spacing:.28em;font-size:26px;margin:10px 0 6px;white-space:pre}
   .lives{font-weight:700}
   .hint{background:#0f1a31;border-left:4px solid var(--accent);padding:10px;border-radius:10px}
@@ -47,22 +46,6 @@
   /* hourglass */
   .hourglass{width:54px;height:86px}
   .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-  /* Millionaire */
-  .ladder{list-style:none;padding:0;margin:0;display:flex;flex-direction:column-reverse;gap:4px}
-  .ladder li{padding:6px 10px;border-radius:10px;border:1px solid #24345a;background:#0f1a31;font-weight:700}
-  .ladder li.active{background:#18335a;border-color:#2a6eea}
-  .ladder li.safe{outline:2px dashed #fca311}
-  .opt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:2px solid #1f335d;background:#17233f;color:#cfe7ff;font-weight:700}
-  .opt.correct{border-color:#2ecc71;background:#113018}
-  .opt.wrong{border-color:#e74c3c;background:#301216}
-  .lifelines .btn{min-width:110px}
-  .poll{margin-top:6px}
-  .bar{height:8px;border-radius:6px;background:#2a3a66;margin:6px 0;position:relative}
-  .bar > span{position:absolute;left:0;top:0;bottom:0;background:#fca311;border-radius:6px}
-  /* Study table */
-  table{width:100%;border-collapse:collapse}
-  th,td{border:1px solid #1e2a46;padding:10px;vertical-align:top}
-  th{background:#16233f}
   @media (max-width:480px){ .kbd{grid-template-columns:repeat(7,1fr)} }
 </style>
 </head>
@@ -72,9 +55,7 @@
     <h1>Vocabulary Games</h1>
     <div class="tabs">
       <button class="tab-btn active" data-tab="hangman">Hangman</button>
-      <button class="tab-btn" data-tab="seconds">30 Seconds</button>
-      <button class="tab-btn" data-tab="millionaire">Millionaire</button>
-      <button class="tab-btn" data-tab="study">Study</button>
+      <button class="tab-btn" data-tab="seconds">30 Seconds (Definitions)</button>
     </div>
   </header>
 
@@ -108,21 +89,27 @@
   <section id="seconds" class="card" style="display:none">
     <div class="row" style="justify-content:space-between;align-items:center">
       <div class="score">Round Score: <span id="secScore">0</span></div>
+
       <!-- Hourglass timer -->
       <div class="row" style="gap:10px;align-items:center">
         <svg id="hourglass" viewBox="0 0 100 160" class="hourglass" aria-label="Timer hourglass">
+          <!-- clips for “glass” triangles -->
           <defs>
             <clipPath id="clipTop"><polygon points="20,20 80,20 50,80"/></clipPath>
             <clipPath id="clipBottom"><polygon points="20,140 80,140 50,80"/></clipPath>
           </defs>
+          <!-- sand -->
           <rect id="hgTop" x="20" y="20" width="60" height="60" fill="#fca311" clip-path="url(#clipTop)"/>
           <rect id="hgBottom" x="20" y="140" width="60" height="0" fill="#fca311" clip-path="url(#clipBottom)"/>
+          <!-- stream -->
           <rect id="hgStream" x="48.5" y="78" width="3" height="0" fill="#fca311" visibility="hidden"/>
+          <!-- glass outline -->
           <polygon points="20,20 80,20 50,80 20,140 80,140 50,80" fill="none" stroke="#cfe7ff" stroke-width="4"/>
+          <!-- top and bottom bars -->
           <rect x="15" y="10" width="70" height="8" fill="#cfe7ff"/>
           <rect x="15" y="142" width="70" height="8" fill="#cfe7ff"/>
         </svg>
-        <span id="secTime" class="sr-only">30</span>
+        <span id="secTime" class="sr-only">30</span> <!-- hidden numeric for accessibility -->
       </div>
     </div>
 
@@ -137,22 +124,257 @@
     <div id="secFeedback" class="big" style="margin-top:8px"></div>
     <div id="secLast" class="muted" style="margin-top:6px"></div>
   </section>
+</div>
 
-  <!-- Millionaire -->
-  <section id="millionaire" class="card" style="display:none">
-    <div class="flex">
-      <div class="grow">
-        <div class="row" style="justify-content:space-between">
-          <span class="pill">Question <span id="milNum">1</span>/10</span>
-          <span class="pill">Earnings: R<span id="milEarn">0</span></span>
-        </div>
-        <div id="milQText" class="def-box" style="margin:10px 0 8px"></div>
-        <div id="milOptions" class="col">
-          <button class="opt" data-i="0" id="milA">A. </button>
-          <button class="opt" data-i="1" id="milB">B. </button>
-          <button class="opt" data-i="2" id="milC">C. </button>
-          <button class="opt" data-i="3" id="milD">D. </button>
-        </div>
-        <div class="lifelines row" style="margin-top:10px">
-          <button id="ll5050" class="btn secondary">50:50</button>
-          <button id
+<div class="toast" id="toast">Saved</div>
+
+<script>
+/* --------- Tiny sound effects (offline, no files) ---------- */
+let AC;
+function beep(type="ok"){
+  try{
+    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    const o = AC.createOscillator();
+    const g = AC.createGain();
+    o.connect(g); g.connect(AC.destination);
+    const now = AC.currentTime;
+    const P = {ok:660, wrong:200, win:880, lose:120, time:300}[type] || 500;
+    o.frequency.setValueAtTime(P, now);
+    g.gain.setValueAtTime(0.001, now);
+    g.gain.exponentialRampToValueAtTime(0.2, now+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, now+0.22);
+    o.type = type==="win" ? "triangle" : "sine";
+    o.start(now); o.stop(now+0.25);
+  }catch(e){}
+}
+
+/* ----------------- Data ------------------ */
+const TERMS = [
+  {w:"reconciliation", d:"The restoration of friendly relations."},
+  {w:"apartheid", d:"A system of institutionalised racial segregation."},
+  {w:"liberation", d:"Freedom from oppression."},
+  {w:"truth", d:"The quality or state of being true."},
+  {w:"conflict", d:"A serious disagreement or argument."},
+  {w:"legacy", d:"What is left behind or remembered."},
+  {w:"respect", d:"A feeling of admiration for someone or something."},
+  {w:"betrayal", d:"Disloyalty or treachery."},
+  {w:"tension", d:"Mental or emotional strain."},
+  {w:"resentment", d:"Bitter indignation at being treated unfairly."},
+  {w:"identity", d:"Who someone is; the sense of self."},
+  {w:"responsibility", d:"A duty to deal with something or someone."},
+  {w:"honesty", d:"Being truthful and sincere."},
+  {w:"justice", d:"Fair treatment or behaviour."},
+  {w:"funeral", d:"A ceremony to honour the dead."},
+  {w:"exile", d:"Being banned from one’s country."},
+  {w:"dialogue", d:"A conversation between two or more people."},
+  {w:"sacrifice", d:"Giving something up for a cause or others."},
+  {w:"repression", d:"The action of subduing someone by force."},
+  {w:"forgiveness", d:"The action of forgiving someone for a mistake or wrongdoing."}
+];
+
+const $ = (id)=>document.getElementById(id);
+const toast = (msg)=>{ const t=$("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1200); };
+const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
+
+/* ---------------- Tabs ------------------- */
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab = btn.dataset.tab;
+    document.querySelectorAll("section").forEach(s=>s.style.display="none");
+    $(tab).style.display="";
+  });
+});
+
+/* =============== HANGMAN (Stickman) ================= */
+let hmWord="", hmMasked=[], hmLives=6, hmUsed=new Set(), hmHint="", hmWins=0;
+
+/* Canvas drawing */
+const cvs = $("hmCanvas");
+const ctx = cvs.getContext("2d");
+function drawGallows(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  ctx.strokeStyle = "#cfe7ff";
+  ctx.lineWidth = 4;
+  // base
+  ctx.beginPath(); ctx.moveTo(30,230); ctx.lineTo(170,230); ctx.stroke();
+  // post / beam / drop
+  ctx.beginPath(); ctx.moveTo(60,230); ctx.lineTo(60,40); ctx.lineTo(200,40); ctx.lineTo(200,65); ctx.stroke();
+  // rope
+  ctx.beginPath(); ctx.moveTo(200,65); ctx.lineTo(200,85); ctx.stroke();
+}
+function drawStage(stage){
+  ctx.strokeStyle = "#fca311";
+  ctx.lineWidth = 4;
+  switch(stage){
+    case 1: ctx.beginPath(); ctx.arc(200,100,15,0,Math.PI*2); ctx.stroke(); break;         // head
+    case 2: ctx.beginPath(); ctx.moveTo(200,115); ctx.lineTo(200,160); ctx.stroke(); break; // body
+    case 3: ctx.beginPath(); ctx.moveTo(200,125); ctx.lineTo(180,145); ctx.stroke(); break; // L arm
+    case 4: ctx.beginPath(); ctx.moveTo(200,125); ctx.lineTo(220,145); ctx.stroke(); break; // R arm
+    case 5: ctx.beginPath(); ctx.moveTo(200,160); ctx.lineTo(185,190); ctx.stroke(); break; // L leg
+    case 6: ctx.beginPath(); ctx.moveTo(200,160); ctx.lineTo(215,190); ctx.stroke(); break; // R leg
+  }
+}
+function drawByMistakes(mistakes){
+  drawGallows();
+  for(let s=1; s<=mistakes && s<=6; s++) drawStage(s);
+}
+
+const drawKeyboard = ()=>{
+  const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  const kb = $("keyboard"); kb.innerHTML="";
+  keys.forEach(k=>{
+    const btn=document.createElement("button");
+    btn.className="key"; btn.textContent=k;
+    btn.addEventListener("click", ()=>guess(k));
+    kb.appendChild(btn);
+  });
+};
+
+function newWord(){
+  const {w,d} = TERMS[Math.floor(Math.random()*TERMS.length)];
+  hmWord = w.toUpperCase(); hmHint = d;
+  hmMasked = hmWord.split("").map(ch=>/[A-Z]/.test(ch) ? "_" : ch);
+  hmLives = 6; hmUsed = new Set();
+  $("slots").textContent = hmMasked.join(" ");
+  $("lives").textContent = hmLives;
+  $("used").textContent = "Used: —";
+  $("hint").style.display="none";
+  $("hint").textContent = "Hint: " + hmHint;
+  $("result").textContent = "";
+  document.querySelectorAll(".key").forEach(k=>k.classList.remove("used"));
+  drawByMistakes(0);
+}
+function reveal(){
+  $("slots").textContent = hmWord.split("").join(" ");
+  $("result").innerHTML = `Answer: <b>${hmWord}</b>`;
+}
+function guess(letter){
+  if(hmLives<=0) return;
+  if(hmUsed.has(letter)) return;
+  hmUsed.add(letter);
+  document.querySelectorAll(".key").forEach(k=>{ if(k.textContent===letter) k.classList.add("used"); });
+  $("used").textContent = "Used: " + [...hmUsed].join(" ");
+
+  if(hmWord.includes(letter)){
+    hmWord.split("").forEach((ch,i)=>{ if(ch===letter) hmMasked[i]=letter; });
+    $("slots").textContent = hmMasked.join(" ");
+    beep("ok");
+    if(!hmMasked.includes("_")){
+      $("result").innerHTML = `<span class="good">Great! You solved it.</span>`;
+      hmWins++; $("wins").textContent = hmWins;
+      beep("win"); toast("Win +1");
+    }
+  }else{
+    hmLives--; $("lives").textContent = hmLives;
+    const mistakes = 6 - hmLives;
+    drawByMistakes(mistakes);
+    beep("wrong");
+    if(hmLives<=0){
+      $("result").innerHTML = `<span class="bad">Out of lives!</span> The word was <b>${hmWord}</b>.`;
+      beep("lose"); toast("Round over");
+    }
+  }
+}
+
+drawKeyboard(); newWord();
+$("btnHint").onclick = ()=>{ $("hint").style.display = $("hint").style.display==="none"?"":"none"; };
+$("btnNew").onclick = ()=>{ newWord(); };
+$("btnReveal").onclick = ()=>{ reveal(); };
+window.addEventListener("keydown",(e)=>{
+  if($("hangman").style.display==="none") return;
+  const L = e.key.toUpperCase();
+  if(L>="A" && L<="Z") guess(L);
+});
+
+/* =========== 30 SECONDS (Definitions) ============ */
+let secRoundActive=false, secTime=30, secTimer=null, secScore=0, secTotal=0, secQueue=[], secCurrent=null;
+const secDuration = 30;
+
+/* Hourglass updater */
+function updateHourglass(){
+  const HG = 60; // height of each triangle
+  const prog = 1 - (secTime / secDuration); // 0 -> 1
+  const topH = (1 - prog) * HG;
+  const bottomH = prog * HG;
+  const top = $("hgTop"), bottom = $("hgBottom"), stream = $("hgStream");
+  top.setAttribute("height", topH.toFixed(2));
+  bottom.setAttribute("y", (140 - bottomH).toFixed(2));
+  bottom.setAttribute("height", bottomH.toFixed(2));
+  if(secRoundActive && secTime>0 && secTime<secDuration){
+    const len = 8 + 34 * prog;
+    stream.setAttribute("y", (80 - len).toFixed(2));
+    stream.setAttribute("height", len.toFixed(2));
+    stream.setAttribute("visibility","visible");
+  }else{
+    stream.setAttribute("visibility","hidden");
+  }
+}
+
+function secondsReset(){
+  secRoundActive=false; secTime=secDuration; secScore=0; secQueue=shuffle(TERMS.slice());
+  secCurrent=null; clearInterval(secTimer);
+  $("secTime").textContent = secTime; // hidden numeric for screen readers
+  $("secScore").textContent = 0;
+  $("secFeedback").textContent = "";
+  $("secInput").value = "";
+  $("secInput").disabled = true;
+  $("secSkip").disabled = true;
+  $("secGive").disabled = true;
+  $("defBox").innerHTML = "Press <b>Start 30-second Round</b> to begin.";
+  updateHourglass();
+}
+function nextDefinition(){
+  if(secQueue.length===0) secQueue = shuffle(TERMS.slice());
+  secCurrent = secQueue.pop();
+  $("defBox").innerHTML = `<b>Definition:</b> ${secCurrent.d}`;
+  $("secInput").value=""; $("secInput").focus();
+}
+function startRound(){
+  if(secRoundActive) return;
+  secondsReset();
+  secRoundActive=true;
+  $("secInput").disabled=false;
+  $("secSkip").disabled=false;
+  $("secGive").disabled=false;
+  nextDefinition();
+  secTimer = setInterval(()=>{
+    secTime--; $("secTime").textContent = secTime;
+    updateHourglass();
+    if(secTime<=0){ endRound(); beep("time"); }
+  },1000);
+}
+function endRound(){
+  clearInterval(secTimer); secRoundActive=false;
+  $("secInput").disabled=true; $("secSkip").disabled=true; $("secGive").disabled=true;
+  $("secFeedback").innerHTML = `⏱️ Round over. You scored <b>${secScore}</b>.`;
+  $("secLast").innerHTML = "";
+  toast("Round finished");
+  updateHourglass();
+}
+
+$("secStart").onclick = startRound;
+$("secSkip").onclick = ()=>{ if(!secRoundActive) return; $("secLast").innerHTML = `Skipped: <b>${secCurrent.w}</b>`; nextDefinition(); };
+$("secGive").onclick = ()=>{ if(!secRoundActive) return; $("secLast").innerHTML = `Answer: <b>${secCurrent.w}</b>`; nextDefinition(); };
+$("secInput").addEventListener("keydown",(e)=>{
+  if(e.key==="Enter"){
+    const guess = e.target.value.trim().toLowerCase();
+    if(!guess) return;
+    if(guess === secCurrent.w.toLowerCase()){
+      secScore++; secTotal++; $("secScore").textContent = secScore; $("secTotal").textContent = secTotal;
+      $("secFeedback").innerHTML = `<span class="good">Correct!</span>`;
+      beep("ok"); nextDefinition();
+    }else{
+      $("secFeedback").innerHTML = `<span class="bad">Try again.</span>`;
+      beep("wrong");
+    }
+  }
+});
+
+secondsReset();
+</script>
+</body>
+</html>
+
+
