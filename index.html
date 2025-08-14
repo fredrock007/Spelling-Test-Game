@@ -2,93 +2,158 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Grade 9 HL – Vocabulary Suite</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vocabulary Games Hub — Neon Edition</title>
 <style>
   :root{
-    --bg:#0b132b; --panel:#121e36; --accent:#5bc0be; --accent2:#fca311;
-    --good:#2ecc71; --bad:#e74c3c; --text:#e6eef5; --outline:#cfe7ff;
+    --bg:#070b1a; --panel:rgba(14,18,36,.72); --glass:rgba(20,26,55,.55);
+    --text:#e7f2ff; --muted:#a8bfdd; --accent:#00f5d4; --accent2:#ff5e57; --accent3:#8a5cff; --accent4:#fca311;
+    --good:#2ecc71; --bad:#ff4d6d;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Inter,Roboto,Arial}
-  .wrap{max-width:1200px;margin:0 auto;padding:16px}
-  header{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-  h1{font-size:22px;margin:0}
-  .tabs{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
-  .tab-btn{border:0;padding:10px 14px;border-radius:12px;background:#1e2a46;color:#cfe7ff;cursor:pointer}
-  .tab-btn.active{background:var(--accent);color:#062531;font-weight:700}
-  .card{background:var(--panel);border:1px solid #1e2a46;border-radius:16px;padding:16px;box-shadow:0 6px 22px rgba(0,0,0,.25)}
-  .flex{display:flex;gap:14px;flex-wrap:wrap}
-  .grow{flex:1 1 360px}
-  .muted{opacity:.8}
-  .btn{border:0;background:var(--accent);color:#062531;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:700}
-  .btn.secondary{background:#1e2a46;color:#cfe7ff}
-  .btn.warn{background:var(--accent2);color:#130a00}
-  .btn:disabled{opacity:.5;cursor:not-allowed}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#1e2a46;color:#cfe7ff;font-size:12px}
-  .good{color:var(--good)} .bad{color:var(--bad)}
-  .big{font-size:20px}
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#101a31;border:1px solid #20325b;color:#dff3ff;padding:10px 14px;border-radius:999px;opacity:0;transition:opacity .2s, transform .2s;pointer-events:none}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+  html,body{height:100%;margin:0;background:radial-gradient(1200px 600px at 10% -10%,#102153 0,#0c1736 30%,#070b1a 65%) fixed;color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+  .wrap{max-width:1220px;margin:0 auto;padding:20px}
+  header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .brand{font-weight:900;font-size:24px;letter-spacing:.5px}
+  .neon{background:linear-gradient(90deg,var(--accent),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tabs{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+  .tab-btn{border:1px solid rgba(255,255,255,.08);padding:10px 14px;border-radius:999px;background:linear-gradient(180deg,#121a38,#0d1430);color:var(--text);cursor:pointer}
+  .tab-btn.active{color:#061314;background:linear-gradient(180deg,var(--accent) 0,var(--accent3) 100%);font-weight:800;box-shadow:0 0 24px rgba(0,245,212,.25)}
+  .badge{background:linear-gradient(90deg,var(--accent3),var(--accent2));padding:6px 10px;border-radius:999px;font-size:12px}
+  .ghost{background:transparent;border:1px solid rgba(255,255,255,.2)}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#101a34;border:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:12px}
+  .btn{border:0;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:700;color:#061314;background:linear-gradient(180deg,var(--accent) 0,var(--accent3) 100%);box-shadow:0 6px 22px rgba(138,92,255,.25)}
+  .btn.secondary{color:#cfe7ff;background:linear-gradient(180deg,#1b2546 0,#121c3a 100%);border:1px solid rgba(255,255,255,.08)}
+  .btn.warn{color:#130a00;background:linear-gradient(180deg,#ffd166 0,var(--accent4) 100%)}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+  .card{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 10px 40px rgba(0,0,0,.35),0 0 50px rgba(138,92,255,.05);backdrop-filter:blur(8px)}
+  .flex{display:flex;gap:16px;flex-wrap:wrap}.grow{flex:1 1 360px}
+  .muted{color:var(--muted)} .big{font-size:18px}
+  .grid-2{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+  @media (max-width:980px){.grid-2{grid-template-columns:1fr}}
+
+  /* Dashboard */
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media (max-width:900px){.statgrid{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:linear-gradient(180deg,#101837,#0c1330);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px}
+  .stat h4{margin:0 0 6px 0;font-size:12px;color:#bcd1ff}.stat .v{font-size:24px;font-weight:900}
+  .avatar{width:56px;height:56px;border-radius:14px;background:linear-gradient(180deg,var(--accent3),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:900}
+  .lb{list-style:none;margin:8px 0 0 0;padding:0}.lb li{padding:8px 10px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:linear-gradient(180deg,#0f1836,#0b1230);display:flex;justify-content:space-between;margin-bottom:8px}
+
   /* Hangman */
+  .hm-title{font-weight:800;margin:0 0 8px 0;letter-spacing:.4px}
+  canvas{background:linear-gradient(180deg,#0c1228,#0a0f21);border:1px solid rgba(255,255,255,.1);border-radius:16px;max-width:100%}
   .slots{letter-spacing:.28em;font-size:26px;margin:10px 0 6px;white-space:pre}
   .kbd{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:12px}
-  .key{background:#17233f;border:1px solid #1f335d;border-radius:10px;padding:10px 0;text-align:center;font-weight:700;cursor:pointer}
-  .key.used{opacity:.4;pointer-events:none}
-  .hint{background:#0f1a31;border-left:4px solid var(--accent);padding:10px;border-radius:10px}
-  .hm-title{font-weight:800;margin:0 0 8px 0;letter-spacing:.4px}
-  canvas{background:#0c152b;border:1px solid #1e2a46;border-radius:12px;max-width:100%}
-  /* 30 Seconds hourglass */
-  .hourglass{width:54px;height:86px}
-  .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-  input[type="text"]{width:100%;padding:12px;border-radius:12px;border:1px solid #213152;background:#0f1a31;color:#e6eef5;font-size:16px}
-  .def-box{font-size:18px;line-height:1.45}
+  .key{background:linear-gradient(180deg,#131e41,#101936);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 0;text-align:center;font-weight:700;cursor:pointer;color:#cfe7ff}
+  .key.used{opacity:.35;pointer-events:none}
+  .hint{background:linear-gradient(180deg,#0f1837,#0b1230);border:1px solid rgba(255,255,255,.08);padding:10px;border-radius:10px}
+  .good{color:var(--good)} .bad{color:var(--bad)}
+
+  /* 30 Seconds */
+  input[type="text"]{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,#0c1530,#0a1126);color:#e6eef5;font-size:16px}
+  .def-box{font-size:18px;line-height:1.45}.hourglass{width:58px;height:90px}.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0)}
+
   /* Millionaire */
-  .mill-grid{display:grid;grid-template-columns: 1.4fr 1fr; gap:14px}
   .ladder{list-style:none;padding:0;margin:0;display:flex;flex-direction:column-reverse;gap:6px}
-  .ladder li{padding:8px 10px;border:1px solid #213152;border-radius:10px;background:#0f1a31;font-weight:700;display:flex;justify-content:space-between}
-  .ladder li.active{background:#14385a;border-color:var(--accent);color:#dff9ff}
+  .ladder li{padding:8px 10px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:linear-gradient(180deg,#0f1836,#0b1230);font-weight:700;display:flex;justify-content:space-between}
+  .ladder li.active{background:linear-gradient(90deg,rgba(0,245,212,.35),rgba(138,92,255,.35));border-color:var(--accent);color:#e9fcff}
   .opt{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-  .opt button{padding:12px;border-radius:12px;border:2px solid #213152;background:#0f1a31;color:#e6eef5;font-weight:800;cursor:pointer}
-  .opt button:hover{border-color:#345b9b}
-  .opt .right{border-color:#2ecc71;background:#12351e}
-  .opt .wrong{border-color:#e74c3c;background:#351212}
-  .lifelines{display:flex;gap:8px;flex-wrap:wrap}
-  /* Study with subtabs */
-  .study-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .opt button{padding:12px;border-radius:12px;border:2px solid rgba(255,255,255,.12);background:linear-gradient(180deg,#10193a,#0d1633);color:#e6eef5;font-weight:800;cursor:pointer}
+  .opt button:hover{border-color:#3c62a7}
+  .opt .right{border-color:var(--good);box-shadow:0 0 18px rgba(46,204,113,.3)}
+  .opt .wrong{border-color:var(--bad);box-shadow:0 0 18px rgba(255,77,109,.25)}
+
+  /* Study */
   .subtabs{display:flex;gap:8px;margin-bottom:10px}
-  .sub-btn{border:0;padding:8px 12px;border-radius:10px;background:#1e2a46;color:#cfe7ff;cursor:pointer}
-  .sub-btn.active{background:var(--accent);color:#062531;font-weight:800}
+  .sub-btn{border:1px solid rgba(255,255,255,.1);padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,#121a38,#0d1430);color:#cfe7ff;cursor:pointer}
+  .sub-btn.active{color:#061314;background:linear-gradient(180deg,var(--accent2),var(--accent3));font-weight:800;box-shadow:0 0 18px rgba(255,94,87,.22)}
   table{width:100%;border-collapse:collapse}
-  th,td{border:1px solid #20325b;padding:8px;vertical-align:top}
-  th{background:#0f1a31}
-  .qa-item{border:1px solid #20325b;border-radius:10px;padding:10px;background:#0f1a31;margin-bottom:8px}
-  .qa-q{font-weight:800}
-  .qa-a{margin-top:6px;display:none}
-  .small{font-size:12px}
-  @media (max-width:900px){ .mill-grid{grid-template-columns:1fr} }
-  @media (max-width:480px){ .kbd{grid-template-columns:repeat(7,1fr)} }
+  th,td{border:1px solid rgba(255,255,255,.08);padding:8px;vertical-align:top}
+  th{background:linear-gradient(180deg,#0f1837,#0b1230)}
+
+  /* Toast + modal */
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0d1640;border:1px solid rgba(255,255,255,.12);color:#dff3ff;padding:10px 14px;border-radius:999px;opacity:0;transition:opacity .2s, transform .2s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+  .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(3,6,18,.75),rgba(3,6,18,.9));backdrop-filter:blur(6px);z-index:10}
+  .modal-card{width:min(540px,92%);background:var(--glass);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .field{display:flex;flex-direction:column;gap:6px;flex:1}
+  label{font-size:12px;color:#cfdcff}
+  select{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,#0c1530,#0a1126);color:#e6eef5;font-size:16px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Vocabulary Games</h1>
+    <div class="brand">Vocabulary <span class="neon">Games Hub</span></div>
+    <span id="studentBadge" class="badge">No student</span>
+    <button id="btnChangeStudent" class="tab-btn ghost">Change Student</button>
     <div class="tabs">
-      <button class="tab-btn active" data-tab="hangman">Hangman</button>
+      <button class="tab-btn active" data-tab="dash">Dashboard</button>
+      <button class="tab-btn" data-tab="hangman">Hangman</button>
       <button class="tab-btn" data-tab="seconds">30 Seconds</button>
       <button class="tab-btn" data-tab="million">Millionaire</button>
       <button class="tab-btn" data-tab="study">Study</button>
     </div>
   </header>
 
-  <!-- Hangman -->
-  <section id="hangman" class="card">
+  <!-- DASHBOARD -->
+  <section id="dash" class="card">
+    <div class="grid-2">
+      <div class="card" style="background:linear-gradient(180deg,#0c1430,#0a1126);">
+        <div class="row">
+          <div class="avatar" id="avatar">A</div>
+          <div>
+            <div class="muted">Student</div>
+            <div id="d_name" style="font-weight:900;font-size:20px">—</div>
+            <div id="d_class" class="muted">—</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn secondary" id="btnResetStats">Reset My Stats</button>
+          <button class="btn" id="btnQuickPlay">Jump into Hangman</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="muted">Notes</div>
+        <div class="big">Local login keeps scores & leaderboards on this device even after closing the tab. For multi-device leaderboards, plug in a backend later (Supabase ready hooks included).</div>
+      </div>
+    </div>
+
+    <div class="statgrid" style="margin-top:12px">
+      <div class="stat"><h4>Merits</h4><div class="v" id="s_merits">0</div></div>
+      <div class="stat"><h4>Hangman Wins</h4><div class="v" id="s_hm_wins">0</div></div>
+      <div class="stat"><h4>30 Seconds — Fastest Correct</h4><div class="v" id="s_30_fast">—</div></div>
+      <div class="stat"><h4>30 Seconds — Correct Total</h4><div class="v" id="s_30_total">0</div></div>
+      <div class="stat"><h4>Millionaire — Best Step</h4><div class="v" id="s_mil_best">0 / 15</div></div>
+      <div class="stat"><h4>Millionaire — Correct</h4><div class="v" id="s_mil_correct">0</div></div>
+      <div class="stat"><h4>Millionaire — Answered</h4><div class="v" id="s_mil_answered">0</div></div>
+      <div class="stat"><h4>Accuracy</h4><div class="v" id="s_accuracy">0%</div></div>
+    </div>
+
+    <div class="grid-2" style="margin-top:14px">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <h3 style="margin:0">Class Leaderboard</h3>
+          <span id="lbClassLabel" class="pill">—</span>
+        </div>
+        <ol id="lbClass" class="lb"></ol>
+      </div>
+      <div class="card">
+        <h3 style="margin:0">Grade Leaderboard</h3>
+        <ol id="lbGrade" class="lb"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- HANGMAN -->
+  <section id="hangman" class="card" style="display:none">
     <div class="flex">
-      <div class="grow" style="max-width:420px">
+      <div class="grow" style="max-width:480px">
         <h2 class="hm-title">Mr Samuels - Grade 9 HL Hangman</h2>
-        <canvas id="hmCanvas" width="380" height="260" aria-label="Hangman drawing"></canvas>
+        <canvas id="hmCanvas" width="430" height="280" aria-label="Hangman drawing"></canvas>
       </div>
       <div class="grow">
         <div class="row">
@@ -109,27 +174,21 @@
     </div>
   </section>
 
-  <!-- 30 Seconds -->
+  <!-- 30 SECONDS -->
   <section id="seconds" class="card" style="display:none">
     <div class="row" style="justify-content:space-between;align-items:center">
       <div class="pill">Round Score: <span id="secScore">0</span></div>
       <div class="row" style="gap:10px;align-items:center">
         <svg id="hourglass" viewBox="0 0 100 160" class="hourglass" aria-label="Timer hourglass">
-          <defs>
-            <clipPath id="clipTop"><polygon points="20,20 80,20 50,80"/></clipPath>
-            <clipPath id="clipBottom"><polygon points="20,140 80,140 50,80"/></clipPath>
-          </defs>
+          <defs><clipPath id="clipTop"><polygon points="20,20 80,20 50,80"/></clipPath><clipPath id="clipBottom"><polygon points="20,140 80,140 50,80"/></clipPath></defs>
           <rect id="hgTop" x="20" y="20" width="60" height="60" fill="#fca311" clip-path="url(#clipTop)"/>
           <rect id="hgBottom" x="20" y="140" width="60" height="0" fill="#fca311" clip-path="url(#clipBottom)"/>
           <rect id="hgStream" x="48.5" y="78" width="3" height="0" fill="#fca311" visibility="hidden"/>
           <polygon points="20,20 80,20 50,80 20,140 80,140 50,80" fill="none" stroke="#cfe7ff" stroke-width="4"/>
-          <rect x="15" y="10" width="70" height="8" fill="#cfe7ff"/>
-          <rect x="15" y="142" width="70" height="8" fill="#cfe7ff"/>
-        </svg>
-        <span id="secTime" class="sr-only">30</span>
+          <rect x="15" y="10" width="70" height="8" fill="#cfe7ff"/><rect x="15" y="142" width="70" height="8" fill="#cfe7ff"/>
+        </svg><span id="secTime" class="sr-only">30</span>
       </div>
     </div>
-
     <div id="defBox" class="def-box" style="margin:10px 0 8px"></div>
     <input id="secInput" type="text" placeholder="Type the word here…" autocomplete="off" />
     <div class="row" style="margin-top:10px">
@@ -139,16 +198,16 @@
       <span class="pill">Correct total: <span id="secTotal">0</span></span>
     </div>
     <div id="secFeedback" class="big" style="margin-top:8px"></div>
-    <div id="secLast" class="muted small" style="margin-top:6px"></div>
+    <div id="secLast" class="muted" style="margin-top:6px"></div>
   </section>
 
-  <!-- Millionaire -->
+  <!-- MILLIONAIRE -->
   <section id="million" class="card" style="display:none">
-    <div class="mill-grid">
+    <div class="grid-2">
       <div>
         <div class="row" style="justify-content:space-between;align-items:center">
           <div class="pill">Question <span id="milStep">1</span>/15</div>
-          <div class="lifelines">
+          <div class="row">
             <button id="mil5050" class="btn secondary">50:50</button>
             <button id="milSkip" class="btn secondary">Skip</button>
             <button id="milQuit" class="btn warn">Quit</button>
@@ -161,413 +220,206 @@
           <button id="milStart" class="btn">Start New Game</button>
         </div>
       </div>
-      <div>
-        <ul class="ladder" id="milLadder"></ul>
-      </div>
+      <div><ul class="ladder" id="milLadder"></ul></div>
     </div>
   </section>
 
-  <!-- Study (with subtabs) -->
+  <!-- STUDY -->
   <section id="study" class="card" style="display:none">
     <div class="subtabs">
       <button class="sub-btn active" data-sub="studyVocab">Vocabulary</button>
       <button class="sub-btn" data-sub="studyQA">Animal Farm Q&A</button>
     </div>
 
-    <!-- Vocabulary subtab -->
     <div id="studyVocab">
-      <div class="study-controls">
-        <input id="studySearch" type="text" placeholder="Search word/definition/example…" />
+      <div class="row"><input id="studySearch" type="text" placeholder="Search word/definition/example…" />
         <button id="studyReset" class="btn secondary">Clear</button>
-        <button id="studyPrint" class="btn">Print</button>
+        <button id="studyPrint" class="btn">Print</button></div>
+      <div style="overflow:auto; max-height:60vh; margin-top:8px">
+        <table id="studyTable"><thead><tr><th style="width:18%">Word</th><th style="width:37%">Definition</th><th>Example sentence</th></tr></thead><tbody></tbody></table>
       </div>
-      <div style="overflow:auto; max-height:60vh;">
-        <table id="studyTable">
-          <thead><tr><th style="width:18%">Word</th><th style="width:37%">Definition</th><th>Example sentence</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div class="small muted" style="margin-top:8px">Source: Classroom vocabulary list for Grade 9 HL.</div>
+      <div class="muted" style="margin-top:8px">Source: Classroom vocabulary list for Grade 9 HL.</div>
     </div>
 
-    <!-- Animal Farm Q&A subtab -->
     <div id="studyQA" style="display:none">
-      <div class="study-controls">
-        <input id="qaSearch" type="text" placeholder="Search questions/answers…" />
+      <div class="row"><input id="qaSearch" type="text" placeholder="Search questions/answers…" />
         <button id="qaReset" class="btn secondary">Clear</button>
-        <button id="qaPrint" class="btn">Print</button>
-      </div>
-      <div id="qaList" style="max-height:60vh; overflow:auto;"></div>
-      <div class="small muted" style="margin-top:8px">Animal Farm – themes, plot & characters.</div>
+        <button id="qaPrint" class="btn">Print</button></div>
+      <div id="qaList" style="max-height:60vh; overflow:auto; margin-top:8px"></div>
+      <div class="muted" style="margin-top:8px">Animal Farm — themes, plot & characters.</div>
     </div>
   </section>
+</div>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal" style="display:none">
+  <div class="modal-card">
+    <h2 style="margin:0 0 8px 0">Student Login</h2>
+    <div class="muted">Enter your details to track progress on this device.</div>
+    <div class="row" style="margin-top:10px">
+      <div class="field"><label for="inName">Name</label><input id="inName" type="text" placeholder="e.g., Sizwe" /></div>
+      <div class="field"><label for="inSurname">Surname</label><input id="inSurname" type="text" placeholder="e.g., Mokoena" /></div>
+      <div class="field"><label for="inClass">Class</label>
+        <select id="inClass"><option value="">Select…</option><option>9A</option><option>9B</option><option>9C</option></select></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button id="btnLogin" class="btn">Save & Continue</button>
+      <button id="btnLoginCancel" class="btn secondary">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast">Saved</div>
 
 <script>
-/* --------- Tiny sound effects (offline) ---------- */
+/* ---------- utils & audio ---------- */
 let AC;
-function beep(type="ok"){
-  try{
-    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
-    const o = AC.createOscillator();
-    const g = AC.createGain();
-    o.connect(g); g.connect(AC.destination);
-    const now = AC.currentTime;
-    const P = {ok:660, wrong:200, win:880, lose:120, time:300}[type] || 500;
-    o.frequency.setValueAtTime(P, now);
-    g.gain.setValueAtTime(0.001, now);
-    g.gain.exponentialRampToValueAtTime(0.22, now+0.02);
-    g.gain.exponentialRampToValueAtTime(0.001, now+0.25);
-    o.type = type==="win" ? "triangle" : "sine";
-    o.start(now); o.stop(now+0.28);
-  }catch(e){}
+function beep(type="ok"){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);const n=AC.currentTime;const P={ok:660,wrong:200,win:880,lose:120,time:300}[type]||500;o.frequency.setValueAtTime(P,n);g.gain.setValueAtTime(.001,n);g.gain.exponentialRampToValueAtTime(.2,n+.02);g.gain.exponentialRampToValueAtTime(.001,n+.24);o.type=type==="win"?"triangle":"sine";o.start(n);o.stop(n+.26);}catch(e){}}
+const $=id=>document.getElementById(id);
+const toast=msg=>{const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1200);};
+const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+
+/* ---------- data ---------- */
+const TERMS=[{w:"reconciliation",d:"The restoration of friendly relations.",e:"The play explores reconciliation in post-apartheid South Africa."},{w:"apartheid",d:"A system of institutionalised racial segregation.",e:"The legacy of apartheid is central to the play's conflict."},{w:"liberation",d:"Freedom from oppression.",e:"Sipho believed in the struggle for liberation through local activism."},{w:"truth",d:"The quality or state of being true.",e:"The characters struggle to tell the truth about their past."},{w:"conflict",d:"A serious disagreement or argument.",e:"There was a deep conflict between Sipho and his brother."},{w:"legacy",d:"What is left behind or remembered.",e:"Thando questioned the legacy of her uncle."},{w:"respect",d:"A feeling of admiration for someone or something.",e:"Sipho demanded respect as the older brother."},{w:"betrayal",d:"Disloyalty or treachery.",e:"Sipho’s sense of betrayal haunted him."},{w:"tension",d:"Mental or emotional strain.",e:"There was constant tension in the family conversation."},{w:"resentment",d:"Bitter indignation at being treated unfairly.",e:"Sipho harboured resentment toward Themba."},{w:"identity",d:"Who someone is; the sense of self.",e:"Thando struggles with her identity as the truth unfolds."},{w:"responsibility",d:"A duty to deal with something or someone.",e:"Sipho carried the responsibility of caring for the family."},{w:"honesty",d:"Being truthful and sincere.",e:"Honesty is a central value challenged in the play."},{w:"justice",d:"Fair treatment or behaviour.",e:"Sipho wanted justice for his sacrifices."},{w:"funeral",d:"A ceremony to honour the dead.",e:"Themba's funeral brought unresolved issues to light."},{w:"exile",d:"Being banned from one’s country.",e:"Themba lived in exile during apartheid."},{w:"dialogue",d:"A conversation between two or more people.",e:"The dialogue reveals the emotional depth of each character."},{w:"sacrifice",d:"Giving something up for a cause or others.",e:"Sipho made many sacrifices for his family."},{w:"repression",d:"The action of subduing someone by force.",e:"The play looks back on the repression of black South Africans."},{w:"forgiveness",d:"The action of forgiving someone for a mistake or wrongdoing.",e:"Forgiveness becomes a path to healing in the play."}];
+
+const QUESTION_BANK=[/* same 50 Qs from Animal Farm + vocab as in earlier build */ 
+{q:"In Animal Farm, which old boar first inspires the rebellion with his speech?",options:["Old Major","Napoleon","Snowball","Squealer"],correct:"Old Major"},
+{q:"What song does Old Major teach the animals?",options:["Beasts of England","Comrade Napoleon","Animals Unite","The Green Flag"],correct:"Beasts of England"},
+{q:"Which pig is driven off the farm by Napoleon's dogs?",options:["Snowball","Squealer","Minimus","Moses"],correct:"Snowball"},
+{q:"Napoleon in the novel most closely represents which historical figure?",options:["Joseph Stalin","Vladimir Lenin","Adolf Hitler","Winston Churchill"],correct:"Joseph Stalin"},
+{q:"Snowball most closely represents which historical figure?",options:["Leon Trotsky","Joseph Stalin","Tsar Nicholas II","Karl Marx"],correct:"Leon Trotsky"},
+{q:"Squealer primarily symbolises which force?",options:["Propaganda","Education","Religion","Industry"],correct:"Propaganda"},
+{q:"Which hardworking cart-horse repeats 'I will work harder'?",options:["Boxer","Clover","Benjamin","Mollie"],correct:"Boxer"},
+{q:"What ultimately happens to Boxer?",options:["He is sold to the knacker","He retires peacefully","He escapes to Foxwood","He becomes a leader"],correct:"He is sold to the knacker"},
+{q:"The first battle when Mr Jones tries to retake the farm is called…",options:["Battle of the Cowshed","Battle of the Windmill","Battle of the Barn","Battle of Pinchfield"],correct:"Battle of the Cowshed"},
+{q:"What was Snowball's main plan for the windmill?",options:["To generate electricity","To store grain","To be a lookout tower","To be a monument to Old Major"],correct:"To generate electricity"},
+{q:"Which farmer pays with forged banknotes for the timber?",options:["Mr Frederick","Mr Pilkington","Mr Jones","Mr Whymper"],correct:"Mr Frederick"},
+{q:"Moses the raven represents which idea?",options:["Religion and hope of Sugarcandy Mountain","Education and literacy","Law and order","Militarism"],correct:"Religion and hope of Sugarcandy Mountain"},
+{q:"Which animal loves ribbons and sugar lumps and later leaves the farm?",options:["Mollie","Clover","Muriel","The Cat"],correct:"Mollie"},
+{q:"Which hymn replaces 'Beasts of England'?",options:["Comrade Napoleon","Four Legs Good","Green Banner","Animal Farm Forever"],correct:"Comrade Napoleon"},
+{q:"How does the final commandment read at the end?",options:["All animals are equal, but some animals are more equal than others","All animals are equal","No animal shall drink alcohol","Two legs bad, four legs good"],correct:"All animals are equal, but some animals are more equal than others"},
+{q:"The farm's flag is green and originally bears…",options:["Hoof and horn","Hammer and sickle","Plough and sword","Star and stripe"],correct:"Hoof and horn"},
+{q:"The cynical donkey who can read and rarely laughs is…",options:["Benjamin","Boxer","Muriel","Clover"],correct:"Benjamin"},
+{q:"Napoleon raises which animals as his secret police?",options:["The dogs","The sheep","The pigs","The hens"],correct:"The dogs"},
+{q:"Why do the hens rebel under Napoleon?",options:["Their eggs are to be sold","They must work at night","Food is cut permanently","They are forced to migrate"],correct:"Their eggs are to be sold"},
+{q:"Which goat can read well and reads the commandments?",options:["Muriel","Mollie","Clover","Jessie"],correct:"Muriel"},
+{q:"The farmhouse symbolises…",options:["The pigs' privilege and power","Equality among animals","Failure of agriculture","A place of education"],correct:"The pigs' privilege and power"},
+{q:"What happens during the mass 'confessions'?",options:["Animals are executed by the dogs","Animals are exiled","Humans are arrested","The barn is burned"],correct:"Animals are executed by the dogs"},
+{q:"Who acts as go-between with the outside world?",options:["Mr Whymper","Mr Frederick","Mr Pilkington","Mr Jones"],correct:"Mr Whymper"},
+{q:"What causes the first windmill collapse?",options:["A storm","Snowball's sabotage","A human attack","Weak timber"],correct:"A storm"},
+{q:"By the end, what do the sheep bleat?",options:["Four legs good, two legs better!","Four legs good, two legs bad!","Long live Animal Farm!","Napoleon is always right!"],correct:"Four legs good, two legs better!"},
+{q:"At the very end, Animal Farm is renamed…",options:["Manor Farm","Napoleon Farm","Republic of Animals","Foxwood"],correct:"Manor Farm"},
+{q:"Which pig writes poems and songs praising Napoleon?",options:["Minimus","Squealer","Snowball","Muriel"],correct:"Minimus"},
+{q:"Mr Pilkington owns which farm?",options:["Foxwood","Pinchfield","Manor Farm","Sugarcandy"],correct:"Foxwood"},
+{q:"Theme shown by pigs taking human privileges?",options:["Corrupting nature of power","Beauty of nature","Value of sports","Benefits of isolation"],correct:"Corrupting nature of power"},
+{q:"Technique Squealer relies on most?",options:["Propaganda/manipulation","Fair elections","Physical labour","Religious sermons"],correct:"Propaganda/manipulation"},
+{q:"Why is 'Beasts of England' banned?",options:["Rebellion said to be complete","Tune too difficult","Humans demand it","Animals forget words"],correct:"Rebellion said to be complete"},
+{q:"How are rebelling hens punished?",options:["Starved until they submit","Sold to another farm","Combs cut","Made to plough fields"],correct:"Starved until they submit"},
+{q:"Who notices commandments changing but stays silent?",options:["Benjamin","Clover","Boxer","Moses"],correct:"Benjamin"},
+{q:"Windmill finally used for…",options:["Milling corn for profit","Pumping water","Heating stalls","Powering barn lights"],correct:"Milling corn for profit"},
+{q:"After Snowball is expelled, who is blamed for problems?",options:["Snowball","Mr Jones","Benjamin","Whymper"],correct:"Snowball"},
+{q:"Who represents easily-led masses?",options:["The sheep","The dogs","Clover","Muriel"],correct:"The sheep"},
+{q:"Which human owner is friendly at the end dinner?",options:["Mr Pilkington","Mr Frederick","Mr Jones","Mr Whymper"],correct:"Mr Pilkington"},
+{q:"Which commandment is altered to include 'with sheets'?",options:["No animal shall sleep in a bed","No animal shall kill any other animal","No animal shall wear clothes","No animal shall drink alcohol"],correct:"No animal shall sleep in a bed"},
+{q:"Best trait for Boxer?",options:["Loyal & hardworking","Clever & sly","Greedy & vain","Lazy but kind"],correct:"Loyal & hardworking"},
+{q:"Which animal is motherly to ducklings?",options:["Clover","Mollie","Muriel","Cat"],correct:"Clover"},
+{q:"What object shows pigs' full transformation?",options:["Whips","Books","Keys","Lanterns"],correct:"Whips"},
+{q:"What phrase does Boxer add later?",options:["Napoleon is always right","Power to the animals","Pigs know best","For the windmill!"],correct:"Napoleon is always right"},
+{q:"Who first owns Manor Farm?",options:["Mr Jones","Mr Frederick","Mr Pilkington","Mr Whymper"],correct:"Mr Jones"},
+{q:"Who represents organised religion promising afterlife?",options:["Moses","Minimus","Muriel","Cat"],correct:"Moses"},
+{q:"Final card game between pigs & humans symbolises…",options:["Corrupt alliances; rulers indistinguishable","Return to equality","End of trade","New rebellion"],correct:"Corrupt alliances; rulers indistinguishable"},
+{q:'Which word means "The restoration of friendly relations"?',options:["Reconciliation","Justice","Dialogue","Truth"],correct:"Reconciliation"},
+{q:'A system of institutionalised racial segregation is called…',options:["Apartheid","Exile","Repression","Legacy"],correct:"Apartheid"},
+{q:'Which word means "Freedom from oppression"?',options:["Liberation","Respect","Identity","Funeral"],correct:"Liberation"},
+{q:'"The action of forgiving someone for a mistake" defines…',options:["Forgiveness","Honesty","Reconciliation","Sacrifice"],correct:"Forgiveness"},
+{q:'"The action of subduing someone by force" defines…',options:["Repression","Conflict","Responsibility","Justice"],correct:"Repression"},
+{q:'Bitter indignation at being treated unfairly is…',options:["Resentment","Tension","Betrayal","Legacy"],correct:"Resentment"},
+{q:'Disloyalty or treachery is…',options:["Betrayal","Honesty","Respect","Dialogue"],correct:"Betrayal"},
+{q:'A conversation between two or more people is…',options:["Dialogue","Sacrifice","Truth","Funeral"],correct:"Dialogue"}];
+
+/* ---------- tabs ---------- */
+document.querySelectorAll(".tab-btn").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");const t=b.dataset.tab;document.querySelectorAll("section").forEach(s=>s.style.display="none");$(t).style.display="";}));
+document.querySelectorAll(".sub-btn").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".sub-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");const t=b.dataset.sub;["studyVocab","studyQA"].forEach(id=>$(id).style.display=(id===t)?"":"none");}));
+
+/* ---------- student & stats (local) ---------- */
+const KEY_PREFIX="vg_neon_v2";
+function studentId(s){return `${s.class||"?"}-${(s.surname||"").trim().toLowerCase()}-${(s.name||"").trim().toLowerCase()}`;}
+function defaultStats(student){return{student,createdAt:Date.now(),merits:0,hangman:{wins:0},seconds:{totalCorrect:0,totalRounds:0,fastestCorrectMs:null},million:{bestStep:0,totalAnswered:0,totalCorrect:0}};}
+function loadStats(student){const id=studentId(student);const raw=localStorage.getItem(`${KEY_PREFIX}:${id}`);return raw?JSON.parse(raw):defaultStats(student);}
+function saveStats(stats){const id=studentId(stats.student);localStorage.setItem(`${KEY_PREFIX}:${id}`,JSON.stringify(stats));localStorage.setItem(`${KEY_PREFIX}:last`,JSON.stringify(stats.student));updateLeaderboards();}
+const USE_SUPABASE=false; async function saveStatsRemote(s){} async function loadStatsRemote(s){return null;}
+
+let currentStudent=null, STATS=null;
+function setStudent(s){currentStudent=s;const initials=(s.name?.[0]||"")+(s.surname?.[0]||"");$("avatar").textContent=(initials||"A").toUpperCase();$("studentBadge").textContent=s.name?`${s.name} ${s.surname} · ${s.class}`:"No student";$("d_name").textContent=s.name?`${s.name} ${s.surname}`:"—";$("d_class").textContent=s.class||"—";refreshDashboard();}
+async function initStudent(s){let stats=loadStats(s);if(USE_SUPABASE){const cloud=await loadStatsRemote(s);if(cloud)stats=cloud;}STATS=stats;setStudent(STATS.student);saveStats(STATS);}
+function refreshDashboard(){ $("s_merits").textContent=STATS?.merits??0; $("s_hm_wins").textContent=STATS?.hangman.wins??0; $("s_30_total").textContent=STATS?.seconds.totalCorrect??0; const f=STATS?.seconds.fastestCorrectMs; $("s_30_fast").textContent=f?(f/1000).toFixed(2)+"s":"—"; $("s_mil_best").textContent=`${STATS?.million.bestStep??0} / 15`; $("s_mil_correct").textContent=STATS?.million.totalCorrect??0; $("s_mil_answered").textContent=STATS?.million.totalAnswered??0; const totalQ=(STATS?.seconds.totalCorrect??0)+(STATS?.million.totalAnswered??0); const acc=totalQ?Math.round(((STATS.seconds.totalCorrect+STATS.million.totalCorrect)/totalQ)*100):0; $("s_accuracy").textContent=acc+"%"; $("lbClassLabel").textContent=currentStudent?currentStudent.class:"—"; updateLeaderboards(); }
+function showLogin(show=true){$("loginModal").style.display=show?"":"none";}
+$("btnChangeStudent").onclick=()=>showLogin(true); $("btnLoginCancel").onclick=()=>showLogin(false);
+$("btnLogin").onclick=async()=>{const name=$("inName").value.trim(),surname=$("inSurname").value.trim(),cls=$("inClass").value.trim();if(!name||!surname||!cls){toast("Please fill all fields");beep("wrong");return;}await initStudent({name,surname,class:cls});showLogin(false);toast("Welcome! Stats loaded");};
+$("btnResetStats").onclick=()=>{if(!currentStudent)return;STATS=defaultStats(currentStudent);saveStats(STATS);refreshDashboard();toast("Stats reset");};
+$("btnQuickPlay").onclick=()=>{document.querySelector('.tab-btn[data-tab="hangman"]').click();};
+(function(){const last=localStorage.getItem(`${KEY_PREFIX}:last`);if(last){initStudent(JSON.parse(last));}else{showLogin(true);}})();
+
+/* ---------- leaderboards (class + grade) ---------- */
+function getAllStats(){const arr=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||!k.startsWith(`${KEY_PREFIX}:`)||k.endsWith(":last"))continue;try{arr.push(JSON.parse(localStorage.getItem(k)));}catch(e){}}return arr;}
+function scoreOf(s){return (s.merits||0)*100 + (s.million?.bestStep||0)*5 + (s.seconds?.totalCorrect||0)*2 + (s.hangman?.wins||0);}
+function renderLB(listEl, rows){listEl.innerHTML=""; rows.slice(0,5).forEach((r,idx)=>{const li=document.createElement("li");li.innerHTML=`<span>${idx+1}. ${r.student.name} ${r.student.surname} <span class="pill">${r.student.class}</span></span><span>${r.merits} merits · Step ${r.million.bestStep} · HM ${r.hangman.wins} · 30s ${r.seconds.totalCorrect}</span>`;listEl.appendChild(li);}); if(rows.length===0){const li=document.createElement("li");li.innerHTML=`<span>No data yet</span><span>—</span>`;listEl.appendChild(li);} }
+function updateLeaderboards(){const all=getAllStats(); // grade-wide
+  all.sort((a,b)=>scoreOf(b)-scoreOf(a)); renderLB($("lbGrade"), all);
+  if(currentStudent){const cls=all.filter(s=>s.student.class===currentStudent.class).sort((a,b)=>scoreOf(b)-scoreOf(a)); renderLB($("lbClass"), cls);}
 }
-const $ = id => document.getElementById(id);
-const toast = msg => { const t=$("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 1200); };
-const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
 
-/* ----------------- Vocabulary Data ------------------ */
-const TERMS = [
-  {w:"reconciliation", d:"The restoration of friendly relations.", e:"The play explores reconciliation in post-apartheid South Africa."},
-  {w:"apartheid", d:"A system of institutionalised racial segregation.", e:"The legacy of apartheid is central to the play's conflict."},
-  {w:"liberation", d:"Freedom from oppression.", e:"Sipho believed in the struggle for liberation through local activism."},
-  {w:"truth", d:"The quality or state of being true.", e:"The characters struggle to tell the truth about their past."},
-  {w:"conflict", d:"A serious disagreement or argument.", e:"There was a deep conflict between Sipho and his brother."},
-  {w:"legacy", d:"What is left behind or remembered.", e:"Thando questioned the legacy of her uncle."},
-  {w:"respect", d:"A feeling of admiration for someone or something.", e:"Sipho demanded respect as the older brother."},
-  {w:"betrayal", d:"Disloyalty or treachery.", e:"Sipho’s sense of betrayal haunted him."},
-  {w:"tension", d:"Mental or emotional strain.", e:"There was constant tension in the family conversation."},
-  {w:"resentment", d:"Bitter indignation at being treated unfairly.", e:"Sipho harboured resentment toward Themba."},
-  {w:"identity", d:"Who someone is; the sense of self.", e:"Thando struggles with her identity as the truth unfolds."},
-  {w:"responsibility", d:"A duty to deal with something or someone.", e:"Sipho carried the responsibility of caring for the family."},
-  {w:"honesty", d:"Being truthful and sincere.", e:"Honesty is a central value challenged in the play."},
-  {w:"justice", d:"Fair treatment or behaviour.", e:"Sipho wanted justice for his sacrifices."},
-  {w:"funeral", d:"A ceremony to honour the dead.", e:"Themba's funeral brought unresolved issues to light."},
-  {w:"exile", d:"Being banned from one’s country.", e:"Themba lived in exile during apartheid."},
-  {w:"dialogue", d:"A conversation between two or more people.", e:"The dialogue reveals the emotional depth of each character."},
-  {w:"sacrifice", d:"Giving something up for a cause or others.", e:"Sipho made many sacrifices for his family."},
-  {w:"repression", d:"The action of subduing someone by force.", e:"The play looks back on the repression of black South Africans."},
-  {w:"forgiveness", d:"The action of forgiving someone for a mistake or wrongdoing.", e:"Forgiveness becomes a path to healing in the play."}
-];
+/* ---------- Hangman ---------- */
+let hmWord="",hmMasked=[],hmLives=6,hmUsed=new Set(),hmHint="",hmWins=0;
+const cvs=$("hmCanvas"),ctx=cvs.getContext("2d");
+function drawGallows(){ctx.clearRect(0,0,cvs.width,cvs.height);ctx.strokeStyle="#cfe7ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(40,250);ctx.lineTo(200,250);ctx.stroke();ctx.beginPath();ctx.moveTo(80,250);ctx.lineTo(80,50);ctx.lineTo(260,50);ctx.lineTo(260,80);ctx.stroke();ctx.beginPath();ctx.moveTo(260,80);ctx.lineTo(260,105);ctx.stroke();}
+function drawStage(s){ctx.strokeStyle="#fca311";ctx.lineWidth=4;if(s===1){ctx.beginPath();ctx.arc(260,120,16,0,Math.PI*2);ctx.stroke();}if(s===2){ctx.beginPath();ctx.moveTo(260,136);ctx.lineTo(260,182);ctx.stroke();}if(s===3){ctx.beginPath();ctx.moveTo(260,146);ctx.lineTo(238,166);ctx.stroke();}if(s===4){ctx.beginPath();ctx.moveTo(260,146);ctx.lineTo(282,166);ctx.stroke();}if(s===5){ctx.beginPath();ctx.moveTo(260,182);ctx.lineTo(245,212);ctx.stroke();}if(s===6){ctx.beginPath();ctx.moveTo(260,182);ctx.lineTo(275,212);ctx.stroke();}}
+function drawByMistakes(m){drawGallows();for(let i=1;i<=m&&i<=6;i++)drawStage(i);}
+const drawKeyboard=()=>{const kb=$("keyboard");kb.innerHTML="";"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(k=>{const b=document.createElement("button");b.className="key";b.textContent=k;b.onclick=()=>guess(k);kb.appendChild(b);});};
+function newWord(){const {w,d}=TERMS[Math.floor(Math.random()*TERMS.length)];hmWord=w.toUpperCase();hmHint=d;hmMasked=hmWord.split("").map(ch=>/[A-Z]/.test(ch)?"_":ch);hmLives=6;hmUsed=new Set();$("slots").textContent=hmMasked.join(" ");$("lives").textContent=hmLives;$("used").textContent="Used: —";$("hint").style.display="none";$("hint").textContent="Hint: "+hmHint;$("result").textContent="";document.querySelectorAll(".key").forEach(k=>k.classList.remove("used"));drawByMistakes(0);}
+function reveal(){$("slots").textContent=hmWord.split("").join(" ");$("result").innerHTML=`Answer: <b>${hmWord}</b>`;}
+function guess(letter){if(hmLives<=0||hmUsed.has(letter))return;hmUsed.add(letter);document.querySelectorAll(".key").forEach(k=>{if(k.textContent===letter)k.classList.add("used");});$("used").textContent="Used: "+[...hmUsed].join(" ");if(hmWord.includes(letter)){hmWord.split("").forEach((ch,i)=>{if(ch===letter)hmMasked[i]=letter;});$("slots").textContent=hmMasked.join(" ");beep("ok");if(!hmMasked.includes("_")){$("result").innerHTML=`<span class="good">Great! You solved it.</span>`;hmWins++;$("wins").textContent=hmWins;if(STATS){STATS.hangman.wins++;saveStats(STATS);refreshDashboard();}beep("win");toast("Win +1");}}else{hmLives--;$("lives").textContent=hmLives;drawByMistakes(6-hmLives);beep("wrong");if(hmLives<=0){$("result").innerHTML=`<span class="bad">Out of lives!</span> The word was <b>${hmWord}</b>.`;beep("lose");toast("Round over");}}}
+drawKeyboard();newWord();$("btnHint").onclick=()=>{$("hint").style.display=$("hint").style.display==="none"?"":"";};$("btnNew").onclick=()=>newWord();$("btnReveal").onclick=()=>reveal();
+window.addEventListener("keydown",e=>{if($("hangman").style.display==="none")return;const L=e.key.toUpperCase();if(L>="A"&&L<="Z")guess(L);});
 
-/* ---------------- Tabs ------------------- */
-document.querySelectorAll(".tab-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    const tab = btn.dataset.tab;
-    document.querySelectorAll("section").forEach(s=>s.style.display="none");
-    $(tab).style.display="";
-  });
-});
-
-/* =============== HANGMAN ================= */
-let hmWord="", hmMasked=[], hmLives=6, hmUsed=new Set(), hmHint="", hmWins=0;
-const cvs = $("hmCanvas"), ctx = cvs.getContext("2d");
-function drawGallows(){ ctx.clearRect(0,0,cvs.width,cvs.height); ctx.strokeStyle="#cfe7ff"; ctx.lineWidth=4;
-  ctx.beginPath(); ctx.moveTo(30,230); ctx.lineTo(170,230); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(60,230); ctx.lineTo(60,40); ctx.lineTo(200,40); ctx.lineTo(200,65); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(200,65); ctx.lineTo(200,85); ctx.stroke(); }
-function drawStage(s){ ctx.strokeStyle="#fca311"; ctx.lineWidth=4;
-  if(s===1){ctx.beginPath(); ctx.arc(200,100,15,0,Math.PI*2); ctx.stroke();}
-  if(s===2){ctx.beginPath(); ctx.moveTo(200,115); ctx.lineTo(200,160); ctx.stroke();}
-  if(s===3){ctx.beginPath(); ctx.moveTo(200,125); ctx.lineTo(180,145); ctx.stroke();}
-  if(s===4){ctx.beginPath(); ctx.moveTo(200,125); ctx.lineTo(220,145); ctx.stroke();}
-  if(s===5){ctx.beginPath(); ctx.moveTo(200,160); ctx.lineTo(185,190); ctx.stroke();}
-  if(s===6){ctx.beginPath(); ctx.moveTo(200,160); ctx.lineTo(215,190); ctx.stroke();}
-}
-function drawByMistakes(m){ drawGallows(); for(let i=1;i<=m && i<=6;i++) drawStage(i); }
-const drawKeyboard=()=>{ const kb=$("keyboard"); kb.innerHTML=""; "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(k=>{const b=document.createElement("button"); b.className="key"; b.textContent=k; b.onclick=()=>guess(k); kb.appendChild(b);});};
-function newWord(){ const {w,d}=TERMS[Math.floor(Math.random()*TERMS.length)];
-  hmWord=w.toUpperCase(); hmHint=d; hmMasked=hmWord.split("").map(ch=>/[A-Z]/.test(ch)?"_":ch);
-  hmLives=6; hmUsed=new Set(); $("slots").textContent=hmMasked.join(" "); $("lives").textContent=hmLives; $("used").textContent="Used: —";
-  $("hint").style.display="none"; $("hint").textContent="Hint: "+hmHint; $("result").textContent=""; document.querySelectorAll(".key").forEach(k=>k.classList.remove("used")); drawByMistakes(0); }
-function reveal(){ $("slots").textContent=hmWord.split("").join(" "); $("result").innerHTML=`Answer: <b>${hmWord}</b>`; }
-function guess(letter){
-  if(hmLives<=0||hmUsed.has(letter)) return;
-  hmUsed.add(letter); document.querySelectorAll(".key").forEach(k=>{if(k.textContent===letter) k.classList.add("used");});
-  $("used").textContent="Used: "+[...hmUsed].join(" ");
-  if(hmWord.includes(letter)){ hmWord.split("").forEach((ch,i)=>{if(ch===letter) hmMasked[i]=letter;}); $("slots").textContent=hmMasked.join(" "); beep("ok");
-    if(!hmMasked.includes("_")){ $("result").innerHTML=`<span class="good">Great! You solved it.</span>`; hmWins++; $("wins").textContent=hmWins; beep("win"); toast("Win +1"); }
-  }else{ hmLives--; $("lives").textContent=hmLives; drawByMistakes(6-hmLives); beep("wrong");
-    if(hmLives<=0){ $("result").innerHTML=`<span class="bad">Out of lives!</span> The word was <b>${hmWord}</b>.`; beep("lose"); toast("Round over"); } }
-}
-drawKeyboard(); newWord();
-$("btnHint").onclick=()=>{$("hint").style.display=$("hint").style.display==="none"?"": "none";};
-$("btnNew").onclick=()=>newWord();
-$("btnReveal").onclick=()=>reveal();
-window.addEventListener("keydown",e=>{ if($("hangman").style.display==="none") return; const L=e.key.toUpperCase(); if(L>="A"&&L<="Z") guess(L); });
-
-/* =========== 30 SECONDS ============ */
-let secRoundActive=false, secTime=30, secTimer=null, secScore=0, secTotal=0, secQueue=[], secCurrent=null;
+/* ---------- 30 Seconds ---------- */
+let secRoundActive=false,secTime=30,secTimer=null,secScore=0,secTotal=0,secQueue=[],secCurrent=null,secQuestionStart=null;
 const secDuration=30;
-function updateHourglass(){ const HG=60, prog=1-(secTime/secDuration), topH=(1-prog)*HG, bottomH=prog*HG;
-  $("hgTop").setAttribute("height", topH.toFixed(2)); $("hgBottom").setAttribute("y", (140-bottomH).toFixed(2)); $("hgBottom").setAttribute("height", bottomH.toFixed(2));
-  const stream=$("hgStream"); if(secRoundActive&&secTime>0&&secTime<secDuration){ const len=8+34*prog; stream.setAttribute("y",(80-len).toFixed(2)); stream.setAttribute("height",len.toFixed(2)); stream.setAttribute("visibility","visible"); }
-  else stream.setAttribute("visibility","hidden"); }
-function secondsReset(){ secRoundActive=false; secTime=secDuration; secScore=0; secQueue=shuffle(TERMS.slice()); secCurrent=null; clearInterval(secTimer);
-  $("secTime").textContent=secTime; $("secScore").textContent=0; $("secFeedback").textContent=""; $("secInput").value="";
-  $("secInput").disabled=true; $("secSkip").disabled=true; $("secGive").disabled=true; $("defBox").innerHTML="Press <b>Start 30-second Round</b> to begin."; updateHourglass(); }
-function nextDefinition(){ if(secQueue.length===0) secQueue=shuffle(TERMS.slice()); secCurrent=secQueue.pop(); $("defBox").innerHTML=`<b>Definition:</b> ${secCurrent.d}`; $("secInput").value=""; $("secInput").focus(); }
-function startRound(){ if(secRoundActive) return; secondsReset(); secRoundActive=true; $("secInput").disabled=false; $("secSkip").disabled=false; $("secGive").disabled=false; nextDefinition();
-  secTimer=setInterval(()=>{ secTime--; $("secTime").textContent=secTime; updateHourglass(); if(secTime<=0){ endRound(); beep("time"); } },1000); }
-function endRound(){ clearInterval(secTimer); secRoundActive=false; $("secInput").disabled=true; $("secSkip").disabled=true; $("secGive").disabled=true;
-  $("secFeedback").innerHTML=`⏱️ Round over. You scored <b>${secScore}</b>.`; $("secLast").innerHTML=""; toast("Round finished"); updateHourglass(); }
-$("secStart").onclick=startRound;
-$("secSkip").onclick=()=>{ if(!secRoundActive) return; $("secLast").innerHTML=`Skipped: <b>${secCurrent.w}</b>`; nextDefinition(); };
-$("secGive").onclick=()=>{ if(!secRoundActive) return; $("secLast").innerHTML=`Answer: <b>${secCurrent.w}</b>`; nextDefinition(); };
-$("secInput").addEventListener("keydown",e=>{ if(e.key==="Enter"){ const g=e.target.value.trim().toLowerCase(); if(!g) return;
-  if(g===secCurrent.w.toLowerCase()){ secScore++; secTotal++; $("secScore").textContent=secScore; $("secTotal").textContent=secTotal; $("secFeedback").innerHTML=`<span class="good">Correct!</span>`; beep("ok"); nextDefinition(); }
-  else { $("secFeedback").innerHTML=`<span class="bad">Try again.</span>`; beep("wrong"); } } });
+function updateHourglass(){const HG=60,prog=1-(secTime/secDuration),topH=(1-prog)*HG,bottomH=prog*HG;$("hgTop").setAttribute("height",topH.toFixed(2));$("hgBottom").setAttribute("y",(140-bottomH).toFixed(2));$("hgBottom").setAttribute("height",bottomH.toFixed(2));const stream=$("hgStream");if(secRoundActive&&secTime>0&&secTime<secDuration){const len=8+34*prog;stream.setAttribute("y",(80-len).toFixed(2));stream.setAttribute("height",len.toFixed(2));stream.setAttribute("visibility","visible");}else stream.setAttribute("visibility","hidden");}
+function secondsReset(){secRoundActive=false;secTime=secDuration;secScore=0;secQueue=shuffle(TERMS.slice());secCurrent=null;secQuestionStart=null;clearInterval(secTimer);$("secTime").textContent=secTime;$("secScore").textContent=0;$("secFeedback").textContent="";$("secInput").value="";$("secInput").disabled=true;$("secSkip").disabled=true;$("secGive").disabled=true;$("defBox").innerHTML="Press <b>Start 30-second Round</b> to begin.";updateHourglass();}
+function nextDefinition(){if(secQueue.length===0)secQueue=shuffle(TERMS.slice());secCurrent=secQueue.pop();$("defBox").innerHTML=`<b>Definition:</b> ${secCurrent.d}`;$("secInput").value="";$("secInput").focus();secQuestionStart=Date.now();}
+function startRound(){if(secRoundActive)return;secondsReset();secRoundActive=true;$("secInput").disabled=false;$("secSkip").disabled=false;$("secGive").disabled=false;nextDefinition();secTimer=setInterval(()=>{secTime--;$("secTime").textContent=secTime;updateHourglass();if(secTime<=0){endRound();beep("time");}},1000);}
+function endRound(){clearInterval(secTimer);secRoundActive=false;$("secInput").disabled=true;$("secSkip").disabled=true;$("secGive").disabled=true;$("secFeedback").innerHTML=`⏱️ Round over. You scored <b>${secScore}</b>.`;$("secLast").innerHTML="";if(STATS){STATS.seconds.totalRounds++;saveStats(STATS);refreshDashboard();}toast("Round finished");updateHourglass();}
+$("secStart").onclick=startRound;$("secSkip").onclick=()=>{if(!secRoundActive)return;$("secLast").innerHTML=`Skipped: <b>${secCurrent.w}</b>`;nextDefinition();};$("secGive").onclick=()=>{if(!secRoundActive)return;$("secLast").innerHTML=`Answer: <b>${secCurrent.w}</b>`;nextDefinition();};
+$("secInput").addEventListener("keydown",e=>{if(e.key==="Enter"){const g=e.target.value.trim().toLowerCase();if(!g)return;if(g===secCurrent.w.toLowerCase()){secScore++;secTotal++;$("secScore").textContent=secScore;$("secTotal").textContent=secTotal;$("secFeedback").innerHTML=`<span class="good">Correct!</span>`;beep("ok");if(secQuestionStart&&STATS){const elapsed=Date.now()-secQuestionStart;const cur=STATS.seconds.fastestCorrectMs;if(!cur||elapsed<cur)STATS.seconds.fastestCorrectMs=elapsed;STATS.seconds.totalCorrect++;saveStats(STATS);refreshDashboard();}nextDefinition();}else{$("secFeedback").innerHTML=`<span class="bad">Try again.</span>`;beep("wrong");}}});
 secondsReset();
 
-/* =========== MILLIONAIRE (15-step ladder; 50-question bank; uses 15 per game) ============ */
-const ladderValues=[
-  "R 1 000 000","R 500 000","R 250 000","R 125 000","R 64 000",
-  "R 32 000","R 16 000","R 8 000","R 4 000","R 2 000",
-  "R 1 000","R 500","R 300","R 200","R 100"
-];
-let milIndex=0, milUsed5050=false, milUsedSkip=false, milActive=false, milQSet=[];
+/* ---------- Millionaire (merits + leaderboards hooks) ---------- */
+const ladderValues=["R 1 000 000","R 500 000","R 250 000","R 125 000","R 64 000","R 32 000","R 16 000","R 8 000","R 4 000","R 2 000","R 1 000","R 500","R 300","R 200","R 100"];
+let milIndex=0,milUsed5050=false,milUsedSkip=false,milActive=false,milQSet=[],milHalfMeritGiven=false,milFinishMeritGiven=false;
+function buildLadder(){const ul=$("milLadder");ul.innerHTML="";ladderValues.forEach((v,i)=>{const li=document.createElement("li");const step=ladderValues.length-i;li.innerHTML=`<span>${step}</span><span>${v}</span>`;ul.appendChild(li);});}
+function highlightLadder(){const items=[...$("milLadder").children];items.forEach(li=>li.classList.remove("active"));const pos=ladderValues.length-milIndex;if(items[pos-1])items[pos-1].classList.add("active");}
+function prepareGame(){milIndex=0;milUsed5050=false;milUsedSkip=false;milActive=false;milHalfMeritGiven=false;milFinishMeritGiven=false;$("milFeedback").textContent="";$("milStep").textContent="1";$("mil5050").disabled=false;$("milSkip").disabled=false;milQSet=shuffle(QUESTION_BANK).slice(0,15);renderQuestion();}
+function renderQuestion(){const q=milQSet[milIndex];$("milQ").innerHTML=q.q;const w=$("milOpts");w.innerHTML="";q.options.forEach((opt,i)=>{const b=document.createElement("button");b.dataset.opt=opt;b.innerHTML=`<span style="opacity:.8">${String.fromCharCode(65+i)})</span> ${opt}`;b.onclick=()=>checkAnswer(b,opt);w.appendChild(b);});highlightLadder();}
+function maybeAwardMerits(){if(!STATS)return; // +1 halfway (Q8)
+  if(milIndex>=8 && !milHalfMeritGiven){STATS.merits+=1;milHalfMeritGiven=true;toast("+1 merit (Halfway!)");}
+  // +2 completion (only if not skipping to the end)
+  if(milIndex>=15 && !milFinishMeritGiven && !milUsedSkip){STATS.merits+=2;milFinishMeritGiven=true;toast("+2 merits (Completed!)");}}
+function checkAnswer(btn, choice){if(!milActive)milActive=true;const q=milQSet[milIndex],buttons=[...$("milOpts").querySelectorAll("button")];buttons.forEach(b=>b.disabled=true);if(STATS)STATS.million.totalAnswered++;if(choice.toLowerCase()===q.correct.toLowerCase()){if(STATS)STATS.million.totalCorrect++;btn.classList.add("right");beep("ok");setTimeout(()=>{milIndex++;if(STATS){STATS.million.bestStep=Math.max(STATS.million.bestStep,milIndex);}maybeAwardMerits();if(STATS){saveStats(STATS);refreshDashboard();}if(milIndex>=milQSet.length){$("milFeedback").innerHTML=`🏆 <span class="good">Congratulations!</span> You reached <b>${ladderValues[0]}</b>.`;beep("win");milActive=false;}else{$("milStep").textContent=String(milIndex+1);renderQuestion();buttons.forEach(b=>b.classList.remove("right"));}},480);}else{btn.classList.add("wrong");beep("wrong");const cbtn=buttons.find(b=>b.dataset.opt.toLowerCase()===q.correct.toLowerCase());if(cbtn)cbtn.classList.add("right");$("milFeedback").innerHTML=`❌ <span class="bad">Incorrect.</span> Correct answer: <b>${q.correct}</b>.`;milActive=false;if(STATS){saveStats(STATS);refreshDashboard();}}}
+$("mil5050").onclick=()=>{if(milUsed5050)return;milUsed5050=true;$("mil5050").disabled=true;const q=milQSet[milIndex],buttons=[...$("milOpts").querySelectorAll("button")];shuffle(buttons.filter(b=>b.dataset.opt.toLowerCase()!==q.correct.toLowerCase())).slice(0,2).forEach(b=>{b.disabled=true;b.style.opacity=.4;});};
+$("milSkip").onclick=()=>{if(milUsedSkip)return;milUsedSkip=true;$("milSkip").disabled=true;milIndex++;if(STATS){STATS.million.bestStep=Math.max(STATS.million.bestStep,milIndex);saveStats(STATS);refreshDashboard();}if(milIndex>=milQSet.length){$("milFeedback").innerHTML=`You skipped to the end. Final: <b>${ladderValues[0]}</b>.`;milActive=false;return}$("milStep").textContent=String(milIndex+1);renderQuestion();};
+$("milQuit").onclick=()=>{const prizeIndex=Math.max(ladderValues.length-milIndex,1);$("milFeedback").innerHTML=`👋 You quit with <b>${ladderValues[prizeIndex-1]}</b>.`;milActive=false;if(STATS){saveStats(STATS);refreshDashboard();}};
+$("milStart").onclick=()=>{buildLadder();prepareGame();};buildLadder();
 
-/* 50-question bank (Animal Farm + Vocabulary) */
-const QUESTION_BANK = [
-  // --- Animal Farm (themes/plot/characters)
-  {q:"In Animal Farm, which old boar first inspires the rebellion with his speech?", options:["Old Major","Napoleon","Snowball","Squealer"], correct:"Old Major"},
-  {q:"What song does Old Major teach the animals?", options:["Beasts of England","Comrade Napoleon","Animals Unite","The Green Flag"], correct:"Beasts of England"},
-  {q:"Which pig is driven off the farm by Napoleon's dogs?", options:["Snowball","Squealer","Minimus","Moses"], correct:"Snowball"},
-  {q:"Napoleon in the novel most closely represents which historical figure?", options:["Joseph Stalin","Vladimir Lenin","Adolf Hitler","Winston Churchill"], correct:"Joseph Stalin"},
-  {q:"Snowball most closely represents which historical figure?", options:["Leon Trotsky","Joseph Stalin","Tsar Nicholas II","Karl Marx"], correct:"Leon Trotsky"},
-  {q:"Squealer primarily symbolises which force?", options:["Propaganda","Education","Religion","Industry"], correct:"Propaganda"},
-  {q:"Which hardworking cart-horse repeats the maxim 'I will work harder'?", options:["Boxer","Clover","Benjamin","Mollie"], correct:"Boxer"},
-  {q:"What ultimately happens to Boxer?", options:["He is sold to the knacker","He retires peacefully","He escapes to Foxwood","He becomes a leader"], correct:"He is sold to the knacker"},
-  {q:"The first battle when Mr Jones tries to retake the farm is called the…", options:["Battle of the Cowshed","Battle of the Windmill","Battle of the Barn","Battle of Pinchfield"], correct:"Battle of the Cowshed"},
-  {q:"What was Snowball's main plan for the windmill?", options:["To generate electricity","To store grain","To be a lookout tower","To be a monument to Old Major"], correct:"To generate electricity"},
-  {q:"Which farmer pays with forged banknotes for the timber?", options:["Mr Frederick","Mr Pilkington","Mr Jones","Mr Whymper"], correct:"Mr Frederick"},
-  {q:"Moses the raven represents which idea?", options:["Religion and hope of Sugarcandy Mountain","Education and literacy","Law and order","Militarism"], correct:"Religion and hope of Sugarcandy Mountain"},
-  {q:"Which animal loves ribbons and sugar lumps and later leaves the farm?", options:["Mollie","Clover","Muriel","The Cat"], correct:"Mollie"},
-  {q:"Which hymn eventually replaces 'Beasts of England'?", options:["Comrade Napoleon","Four Legs Good","Green Banner","Animal Farm Forever"], correct:"Comrade Napoleon"},
-  {q:"How does the final commandment read at the end of the novel?", options:["All animals are equal, but some animals are more equal than others","All animals are equal","No animal shall drink alcohol","Two legs bad, four legs good"], correct:"All animals are equal, but some animals are more equal than others"},
-  {q:"The farm's flag is green and originally bears which symbols?", options:["Hoof and horn","Hammer and sickle","Plough and sword","Star and stripe"], correct:"Hoof and horn"},
-  {q:"Which animal is the cynical donkey who can read and rarely laughs?", options:["Benjamin","Boxer","Muriel","Clover"], correct:"Benjamin"},
-  {q:"Napoleon raises which animals to act as his secret police?", options:["The dogs","The sheep","The pigs","The hens"], correct:"The dogs"},
-  {q:"Why do the hens rebel under Napoleon?", options:["Their eggs are to be sold for trade","They must work at night","Their food is cut permanently","They are forced to migrate"], correct:"Their eggs are to be sold for trade"},
-  {q:"Which goat can read well and often reads the commandments to the others?", options:["Muriel","Mollie","Clover","Jessie"], correct:"Muriel"},
-  {q:"What does the farmhouse come to symbolise?", options:["The pigs' privilege and power","Equality among animals","The failure of agriculture","A place of education"], correct:"The pigs' privilege and power"},
-  {q:"What happens during the mass 'confessions' later in the novel?", options:["Animals are executed by the dogs","Animals are exiled to other farms","Humans are arrested","The barn is burned"], correct:"Animals are executed by the dogs"},
-  {q:"Who acts as go-between for Animal Farm and the outside world?", options:["Mr Whymper","Mr Frederick","Mr Pilkington","Mr Jones"], correct:"Mr Whymper"},
-  {q:"What actually causes the first windmill to collapse?", options:["A violent storm","Snowball's sabotage","A human attack","Weak timber from Foxwood"], correct:"A violent storm"},
-  {q:"By the end, what slogan do the sheep bleat to support the pigs?", options:["Four legs good, two legs better!","Four legs good, two legs bad!","Long live Animal Farm!","Napoleon is always right!"], correct:"Four legs good, two legs better!"},
-  {q:"At the very end, Animal Farm is renamed…", options:["Manor Farm","Napoleon Farm","The Republic of Animals","Foxwood"], correct:"Manor Farm"},
-  {q:"Which pig writes poems and songs praising Napoleon?", options:["Minimus","Squealer","Snowball","Muriel"], correct:"Minimus"},
-  {q:"Mr Pilkington is the owner of which neighbouring farm?", options:["Foxwood","Pinchfield","Manor Farm","Sugarcandy"], correct:"Foxwood"},
-  {q:"Which theme is best shown by the pigs slowly taking human privileges?", options:["The corrupting nature of power","The beauty of nature","The value of sports","The benefits of isolation"], correct:"The corrupting nature of power"},
-  {q:"Which technique does Squealer most rely on to control opinion?", options:["Propaganda and manipulation of language","Fair elections","Physical labour","Religious sermons"], correct:"Propaganda and manipulation of language"},
-  {q:"Why is 'Beasts of England' banned?", options:["The rebellion is said to be complete","The tune is too difficult","Humans demand it","Animals forget the words"], correct:"The rebellion is said to be complete"},
-  {q:"How are the rebelling hens punished?", options:["They are starved until they give in","They are sold to another farm","Their combs are cut off","They are made to plough fields"], correct:"They are starved until they give in"},
-  {q:"Which animal notices the commandments changing but stays silent?", options:["Benjamin","Clover","Boxer","Moses"], correct:"Benjamin"},
-  {q:"Eventually, what is the windmill used for instead of electricity?", options:["Milling corn for profit","Pumping water for fields","Heating the stalls","Powering lights in the barn"], correct:"Milling corn for profit"},
-  {q:"After Snowball is expelled, who is blamed for most problems?", options:["Snowball","Mr Jones","Benjamin","Mr Whymper"], correct:"Snowball"},
-  {q:"Which character best represents the easily-led masses who follow simple slogans?", options:["The sheep","The dogs","Clover","Muriel"], correct:"The sheep"},
-  {q:"Which human owner is friendly at the end when the pigs host a dinner?", options:["Mr Pilkington","Mr Frederick","Mr Jones","Mr Whymper"], correct:"Mr Pilkington"},
-  {q:"Which commandment is altered to read 'No animal shall sleep in a bed with sheets'?", options:["No animal shall sleep in a bed","No animal shall kill any other animal","No animal shall wear clothes","No animal shall drink alcohol"], correct:"No animal shall sleep in a bed"},
-  {q:"Which trait best describes Boxer?", options:["Loyal and hardworking","Clever and sly","Greedy and vain","Lazy but kind"], correct:"Loyal and hardworking"},
-  {q:"Which animal is motherly and often cares for the ducklings?", options:["Clover","Mollie","Muriel","Cat"], correct:"Clover"},
-  {q:"What object do the pigs eventually carry that shows their full transformation?", options:["Whips","Books","Keys","Lanterns"], correct:"Whips"},
-  {q:"Which phrase does Boxer add to his maxims later in the novel?", options:["Napoleon is always right","Power to the animals","Pigs know best","For the windmill!"], correct:"Napoleon is always right"},
-  {q:"Who first owns Manor Farm before the rebellion?", options:["Mr Jones","Mr Frederick","Mr Pilkington","Mr Whymper"], correct:"Mr Jones"},
-  {q:"Which character represents organised religion promising rewards after death?", options:["Moses","Minimus","Muriel","Cat"], correct:"Moses"},
-  {q:"What does the final card game between pigs and humans symbolise?", options:["Corrupt alliances and indistinguishable rulers","Return to equality","End of trade","Beginning of a new rebellion"], correct:"Corrupt alliances and indistinguishable rulers"},
-  // --- Vocabulary (from the list)
-  {q:'Which word means "The restoration of friendly relations"?', options:["Reconciliation","Justice","Dialogue","Truth"], correct:"Reconciliation"},
-  {q:'A system of institutionalised racial segregation is called…', options:["Apartheid","Exile","Repression","Legacy"], correct:"Apartheid"},
-  {q:'Which word means "Freedom from oppression"?', options:["Liberation","Respect","Identity","Funeral"], correct:"Liberation"},
-  {q:'"The action of forgiving someone for a mistake" defines…', options:["Forgiveness","Honesty","Reconciliation","Sacrifice"], correct:"Forgiveness"},
-  {q:'"The action of subduing someone by force" defines…', options:["Repression","Conflict","Responsibility","Justice"], correct:"Repression"},
-  {q:'Bitter indignation at being treated unfairly is…', options:["Resentment","Tension","Betrayal","Legacy"], correct:"Resentment"},
-  {q:'Disloyalty or treachery is…', options:["Betrayal","Honesty","Respect","Dialogue"], correct:"Betrayal"},
-  {q:'Mental or emotional strain is…', options:["Tension","Conflict","Identity","Exile"], correct:"Tension"},
-  {q:'A duty to deal with something or someone is…', options:["Responsibility","Justice","Respect","Truth"], correct:"Responsibility"},
-  {q:'Fair treatment or behaviour is…', options:["Justice","Forgiveness","Dialogue","Legacy"], correct:"Justice"},
-  {q:'A conversation between two or more people is…', options:["Dialogue","Sacrifice","Truth","Funeral"], correct:"Dialogue"},
-  {q:'Giving something up for a cause or others is…', options:["Sacrifice","Reconciliation","Apartheid","Exile"], correct:"Sacrifice"},
-  {q:'Who someone is; the sense of self is…', options:["Identity","Respect","Honesty","Legacy"], correct:"Identity"},
-  {q:'Being truthful and sincere is…', options:["Honesty","Betrayal","Tension","Responsibility"], correct:"Honesty"},
-  {q:'What is left behind or remembered is…', options:["Legacy","Sacrifice","Reconciliation","Exile"], correct:"Legacy"}
-];
-
-/* Ladder UI */
-function buildLadder(){
-  const ul=$("milLadder"); ul.innerHTML="";
-  ladderValues.forEach((val,i)=>{ const li=document.createElement("li"); const step=ladderValues.length-i; li.innerHTML=`<span>${step}</span><span>${val}</span>`; ul.appendChild(li); });
-}
-function highlightLadder(){
-  const items=[...$("milLadder").children]; items.forEach(li=>li.classList.remove("active"));
-  const pos=ladderValues.length - milIndex; if(items[pos-1]) items[pos-1].classList.add("active");
-}
-
-/* Game flow */
-function prepareGame(){
-  milIndex=0; milUsed5050=false; milUsedSkip=false; milActive=false; $("milFeedback").textContent=""; $("milStep").textContent="1";
-  $("mil5050").disabled=false; $("milSkip").disabled=false;
-  milQSet = shuffle(QUESTION_BANK).slice(0,15); // 15 Qs per game
-  renderQuestion();
-}
-function renderQuestion(){
-  const q=milQSet[milIndex];
-  $("milQ").innerHTML=q.q;
-  const wrap=$("milOpts"); wrap.innerHTML="";
-  q.options.forEach((opt,i)=>{
-    const b=document.createElement("button");
-    b.dataset.opt=opt; // store exact text
-    b.innerHTML=`<span style="opacity:.8">${String.fromCharCode(65+i)})</span> ${opt}`;
-    b.onclick=()=>checkAnswer(b,opt);
-    wrap.appendChild(b);
-  });
-  highlightLadder();
-}
-function checkAnswer(button, choice){
-  if(!milActive) milActive=true;
-  const q=milQSet[milIndex], buttons=[...$("milOpts").querySelectorAll("button")];
-  buttons.forEach(b=>b.disabled=true);
-  if(choice.toLowerCase()===q.correct.toLowerCase()){
-    button.classList.add("right"); beep("ok");
-    setTimeout(()=>{
-      milIndex++;
-      if(milIndex>=milQSet.length){
-        $("milFeedback").innerHTML=`🏆 <span class="good">Congratulations!</span> You reached <b>${ladderValues[0]}</b>.`;
-        beep("win"); milActive=false;
-      }else{
-        $("milStep").textContent=String(milIndex+1);
-        renderQuestion(); buttons.forEach(b=>b.classList.remove("right"));
-      }
-    },500);
-  }else{
-    button.classList.add("wrong"); beep("wrong");
-    const correctBtn = buttons.find(b=>b.dataset.opt.toLowerCase()===q.correct.toLowerCase());
-    if(correctBtn) correctBtn.classList.add("right");
-    $("milFeedback").innerHTML=`❌ <span class="bad">Incorrect.</span> Correct answer: <b>${q.correct}</b>.`;
-    milActive=false; beep("lose");
-  }
-}
-/* Lifelines */
-$("mil5050").onclick=()=>{
-  if(milUsed5050) return; milUsed5050=true; $("mil5050").disabled=true;
-  const q=milQSet[milIndex], buttons=[...$("milOpts").querySelectorAll("button")];
-  const wrongs=buttons.filter(b=>b.dataset.opt.toLowerCase()!==q.correct.toLowerCase());
-  shuffle(wrongs).slice(0,2).forEach(b=>{ b.disabled=true; b.style.opacity=.4; });
-};
-$("milSkip").onclick=()=>{
-  if(milUsedSkip) return; milUsedSkip=true; $("milSkip").disabled=true;
-  milIndex++; if(milIndex>=milQSet.length){ $("milFeedback").innerHTML=`You skipped to the end. Final: <b>${ladderValues[0]}</b>.`; milActive=false; return; }
-  $("milStep").textContent=String(milIndex+1); renderQuestion();
-};
-$("milQuit").onclick=()=>{
-  const prizeIndex=Math.max(ladderValues.length-milIndex,1);
-  $("milFeedback").innerHTML=`👋 You quit with <b>${ladderValues[prizeIndex-1]}</b>.`;
-  milActive=false;
-};
-$("milStart").onclick=()=>{ buildLadder(); prepareGame(); };
-buildLadder();
-
-/* =========== STUDY – SUBTABS, VOCAB TABLE & Q/A BANK ============ */
-/* Subtab toggles */
-document.querySelectorAll(".sub-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".sub-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    const sub = btn.dataset.sub;
-    ["studyVocab","studyQA"].forEach(id => $(id).style.display = (id===sub) ? "" : "none");
-  });
-});
-
-/* Build Vocabulary table */
-function buildStudyTable(){
-  const tb=$("studyTable").querySelector("tbody"); tb.innerHTML="";
-  TERMS.forEach(t=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td><b>${t.w}</b></td><td>${t.d}</td><td><em>${t.e}</em></td>`; tb.appendChild(tr); });
-}
-function filterStudy(){
-  const q=$("studySearch").value.trim().toLowerCase();
-  [...$("studyTable").querySelectorAll("tbody tr")].forEach(r=>{ r.style.display=r.textContent.toLowerCase().includes(q)?"":"none"; });
-}
-$("studySearch").addEventListener("input", filterStudy);
-$("studyReset").onclick=()=>{ $("studySearch").value=""; filterStudy(); };
-$("studyPrint").onclick=()=>{ window.print(); };
-
-/* Animal Farm Q/A bank */
-const AF_QA = [
-  {q:"Who gives the speech that sparks the idea of rebellion?", a:"Old Major, an elderly boar, delivers a speech about animal equality and a future without human oppression."},
-  {q:"What does 'Beasts of England' symbolise in the novel?", a:"Hope and revolutionary zeal. It unites the animals with a common dream of freedom."},
-  {q:"Why do the pigs ban 'Beasts of England' later on?", a:"They claim the rebellion is complete and use a new hymn to redirect loyalty to Napoleon."},
-  {q:"Who is expelled from the farm and later blamed for many problems?", a:"Snowball. Napoleon uses him as a scapegoat to justify failures and clamp down on dissent."},
-  {q:"Which historical figures do Napoleon and Snowball represent?", a:"Napoleon represents Joseph Stalin; Snowball represents Leon Trotsky."},
-  {q:"What does Squealer represent and how?", a:"Propaganda. He manipulates language and statistics to justify Napoleon’s actions and rewrite history."},
-  {q:"What theme is shown by the pigs living in the farmhouse and wearing clothes?", a:"The corrupting nature of power and the betrayal of revolutionary ideals."},
-  {q:"What is Boxer's personal motto and what happens to him?", a:"'I will work harder' (later 'Napoleon is always right'). He is sold to the knacker when he becomes old and injured."},
-  {q:"What is the purpose of the windmill, originally?", a:"Snowball plans it to generate electricity to improve life; later it becomes a symbol of propaganda and profit."},
-  {q:"What causes the first windmill's collapse?", a:"A fierce storm, though Napoleon blames Snowball to maintain control."},
-  {q:"What do the dogs symbolise in Animal Farm?", a:"Napoleon’s secret police—state violence used to intimidate and eliminate opposition."},
-  {q:"How do the Seven Commandments change over time?", a:"They are subtly edited (e.g., 'with sheets') to excuse the pigs’ privileges, showing moral decline."},
-  {q:"What does Moses the raven and 'Sugarcandy Mountain' symbolise?", a:"Organised religion and the promise of a better afterlife used to pacify the oppressed."},
-  {q:"Explain the significance of the mass confessions and executions.", a:"They mirror totalitarian purges—instilling fear, eliminating dissent, and consolidating power."},
-  {q:"Why do the hens rebel and how are they punished?", a:"Their eggs are to be sold; they are starved until they submit."},
-  {q:"What is the meaning of the final commandment, '…some animals are more equal than others'?", a:"It exposes the hypocrisy of the regime and the complete betrayal of equality."},
-  {q:"What does the farmhouse come to represent?", a:"Privilege, hierarchy and the pigs’ assimilation into human behaviour and power."},
-  {q:"How do the sheep influence debates on the farm?", a:"By bleating slogans like 'Four legs good' (later 'two legs better') to drown out rational discussion."},
-  {q:"What is the significance of the final scene with the card game?", a:"Animals looking in cannot tell pigs from humans—power corrupts and rulers become indistinguishable."},
-  {q:"What does the green flag with hoof and horn symbolise initially?", a:"Animal unity and revolutionary ideals (paralleling political symbols like hammer and sickle)."},
-  {q:"How does Orwell use irony in Animal Farm?", a:"The revolution promises equality but ends in a dictatorship mimicking the old oppression."},
-  {q:"What role does literacy play among the animals?", a:"Pigs’ higher literacy lets them control information; other animals’ ignorance makes manipulation easier."},
-  {q:"How is fear used as a tool of control?", a:"Threat of the dogs, purges, and external enemies keeps animals obedient and silent."},
-  {q:"Why are outside humans reintroduced into the story?", a:"Trade and diplomacy show the pigs’ hypocrisy and their blending with the human elite."},
-  {q:"What theme is illustrated by rewriting history on the barn wall?", a:"Control of memory and truth—whoever controls the past controls the present."},
-  {q:"How is Benjamin important thematically?", a:"His cynicism and silence show the danger of apathy in the face of injustice."},
-  {q:"Why does Mollie leave the farm?", a:"She prioritises vanity and comfort (ribbons, sugar) over the duties of the revolution."},
-  {q:"What does the windmill finally produce and why is that important?", a:"Milled corn for profit; it shows the shift from improving lives to enriching the rulers."},
-  {q:"What is the narrative viewpoint of Animal Farm?", a:"A third-person objective style that often mirrors a fable, enhancing the allegory’s clarity."},
-  {q:"How does propaganda change the animals’ memories of Snowball?", a:"He’s recast as a traitor and coward, despite evidence of his heroism in the Battle of the Cowshed."}
-];
-
-/* Build Q/A list */
-function buildQAList(){
-  const wrap = $("qaList"); wrap.innerHTML="";
-  AF_QA.forEach((item, idx)=>{
-    const card = document.createElement("div"); card.className="qa-item";
-    card.innerHTML = `
-      <div class="qa-q">${idx+1}. ${item.q}</div>
-      <div class="qa-a">${item.a}</div>
-      <div class="row" style="margin-top:8px">
-        <button class="btn secondary btnShow">Show Answer</button>
-      </div>
-    `;
-    const btn = card.querySelector(".btnShow");
-    const ans = card.querySelector(".qa-a");
-    btn.addEventListener("click", ()=>{
-      const visible = ans.style.display!=="none";
-      ans.style.display = visible ? "none" : "block";
-      btn.textContent = visible ? "Show Answer" : "Hide Answer";
-    });
-    wrap.appendChild(card);
-  });
-}
-
-/* Filter Q/A */
-function filterQA(){
-  const q = $("qaSearch").value.trim().toLowerCase();
-  [...$("qaList").children].forEach(div=>{
-    const text = div.textContent.toLowerCase();
-    div.style.display = text.includes(q) ? "" : "none";
-  });
-}
-
-$("qaSearch").addEventListener("input", filterQA);
-$("qaReset").onclick = ()=>{ $("qaSearch").value=""; filterQA(); };
-$("qaPrint").onclick = ()=>{ window.print(); };
-
-/* Init Study section */
-buildStudyTable();
-buildQAList();
+/* ---------- Study (table + Q/A) ---------- */
+function buildStudyTable(){const tb=$("studyTable").querySelector("tbody");tb.innerHTML="";TERMS.forEach(t=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${t.w}</b></td><td>${t.d}</td><td><em>${t.e}</em></td>`;tb.appendChild(tr);});}
+function filterStudy(){const q=$("studySearch").value.trim().toLowerCase();[...$("studyTable").querySelectorAll("tbody tr")].forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?"":"none";});}
+$("studySearch").addEventListener("input",filterStudy);$("studyReset").onclick=()=>{$("studySearch").value="";filterStudy();};$("studyPrint").onclick=()=>{window.print();};
+const AF_QA=[{q:"Who gives the speech that sparks the idea of rebellion?",a:"Old Major, an elderly boar, delivers a speech about animal equality and a future without human oppression."},{q:"What does 'Beasts of England' symbolise in the novel?",a:"Hope and revolutionary zeal. It unites the animals with a common dream of freedom."},{q:"Why do the pigs ban 'Beasts of England' later on?",a:"They claim the rebellion is complete and use a new hymn to redirect loyalty to Napoleon."},{q:"Who is expelled from the farm and later blamed for many problems?",a:"Snowball. Napoleon uses him as a scapegoat to justify failures and clamp down on dissent."},{q:"Which historical figures do Napoleon and Snowball represent?",a:"Napoleon represents Joseph Stalin; Snowball represents Leon Trotsky."},{q:"What does Squealer represent and how?",a:"Propaganda. He manipulates language and statistics to justify Napoleon’s actions and rewrite history."},{q:"What theme is shown by the pigs wearing clothes and living in the farmhouse?",a:"The corrupting nature of power and the betrayal of revolutionary ideals."},{q:"What is Boxer's motto and fate?",a:"'I will work harder' (later 'Napoleon is always right'). He is sold to the knacker when he becomes old and injured."},{q:"Originally, what is the windmill for?",a:"To generate electricity and improve life; it later becomes a symbol of propaganda and profit."},{q:"What causes the first windmill collapse?",a:"A fierce storm, though Napoleon blames Snowball to maintain control."},{q:"What do the dogs symbolise?",a:"Napoleon’s secret police—state violence used to intimidate and eliminate opposition."},{q:"How do the Seven Commandments change?",a:"They are quietly edited (e.g., 'with sheets') to excuse the pigs’ privileges, showing moral decline."},{q:"Moses the raven and 'Sugarcandy Mountain' symbolise…",a:"Organised religion and the promise of a better afterlife used to pacify the oppressed."},{q:"Significance of mass confessions and executions?",a:"They mirror totalitarian purges—instilling fear, eliminating dissent, and consolidating power."},{q:"Why do the hens rebel and how are they punished?",a:"Their eggs are to be sold; they are starved until they submit."},{q:"Meaning of the final commandment about being 'more equal'?",a:"It exposes regime hypocrisy and the full betrayal of equality."},{q:"What does the farmhouse represent?",a:"Privilege, hierarchy and the pigs’ assimilation into human behaviour and power."},{q:"How do the sheep influence debates?",a:"By chanting slogans like 'Four legs good' (later 'two legs better') to drown out rational discussion."},{q:"Significance of the final card game?",a:"Animals cannot tell pigs from humans—power corrupts and rulers become indistinguishable."},{q:"What does the green flag with hoof and horn symbolise?",a:"Animal unity and revolutionary ideals (echoing hammer and sickle)."}];
+function buildQAList(){const wrap=$("qaList");wrap.innerHTML="";AF_QA.forEach((it,i)=>{const card=document.createElement("div");card.className="card";card.style.marginBottom="10px";card.innerHTML=`<div class="qa-q"><b>${i+1}.</b> ${it.q}</div><div class="qa-a" style="display:none;margin-top:6px">${it.a}</div><div class="row" style="margin-top:8px"><button class="btn secondary btnShow">Show Answer</button></div>`;const btn=card.querySelector(".btnShow"),ans=card.querySelector(".qa-a");btn.addEventListener("click",()=>{const vis=ans.style.display!=="none";ans.style.display=vis?"none":"block";btn.textContent=vis?"Show Answer":"Hide Answer";});wrap.appendChild(card);});}
+function filterQA(){const q=$("qaSearch").value.trim().toLowerCase();[...$("qaList").children].forEach(div=>{div.style.display=div.textContent.toLowerCase().includes(q)?"":"none";});}
+$("qaSearch").addEventListener("input",filterQA);$("qaReset").onclick=()=>{$("qaSearch").value="";filterQA();};$("qaPrint").onclick=()=>{window.print();};
+buildStudyTable();buildQAList();
 </script>
 </body>
 </html>
