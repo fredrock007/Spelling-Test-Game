@@ -55,11 +55,17 @@
   .opt .right{border-color:#2ecc71;background:#12351e}
   .opt .wrong{border-color:#e74c3c;background:#351212}
   .lifelines{display:flex;gap:8px;flex-wrap:wrap}
-  /* Study */
+  /* Study with subtabs */
   .study-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .subtabs{display:flex;gap:8px;margin-bottom:10px}
+  .sub-btn{border:0;padding:8px 12px;border-radius:10px;background:#1e2a46;color:#cfe7ff;cursor:pointer}
+  .sub-btn.active{background:var(--accent);color:#062531;font-weight:800}
   table{width:100%;border-collapse:collapse}
   th,td{border:1px solid #20325b;padding:8px;vertical-align:top}
   th{background:#0f1a31}
+  .qa-item{border:1px solid #20325b;border-radius:10px;padding:10px;background:#0f1a31;margin-bottom:8px}
+  .qa-q{font-weight:800}
+  .qa-a{margin-top:6px;display:none}
   .small{font-size:12px}
   @media (max-width:900px){ .mill-grid{grid-template-columns:1fr} }
   @media (max-width:480px){ .kbd{grid-template-columns:repeat(7,1fr)} }
@@ -161,20 +167,39 @@
     </div>
   </section>
 
-  <!-- Study -->
+  <!-- Study (with subtabs) -->
   <section id="study" class="card" style="display:none">
-    <div class="study-controls">
-      <input id="studySearch" type="text" placeholder="Search word/definition/example…" />
-      <button id="studyReset" class="btn secondary">Clear</button>
-      <button id="studyPrint" class="btn">Print</button>
+    <div class="subtabs">
+      <button class="sub-btn active" data-sub="studyVocab">Vocabulary</button>
+      <button class="sub-btn" data-sub="studyQA">Animal Farm Q&A</button>
     </div>
-    <div style="overflow:auto; max-height:65vh;">
-      <table id="studyTable">
-        <thead><tr><th style="width:18%">Word</th><th style="width:37%">Definition</th><th>Example sentence</th></tr></thead>
-        <tbody></tbody>
-      </table>
+
+    <!-- Vocabulary subtab -->
+    <div id="studyVocab">
+      <div class="study-controls">
+        <input id="studySearch" type="text" placeholder="Search word/definition/example…" />
+        <button id="studyReset" class="btn secondary">Clear</button>
+        <button id="studyPrint" class="btn">Print</button>
+      </div>
+      <div style="overflow:auto; max-height:60vh;">
+        <table id="studyTable">
+          <thead><tr><th style="width:18%">Word</th><th style="width:37%">Definition</th><th>Example sentence</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="small muted" style="margin-top:8px">Source: Classroom vocabulary list for Grade 9 HL.</div>
     </div>
-    <div class="small muted" style="margin-top:8px">Source: Classroom vocabulary list for Grade 9 HL.</div>
+
+    <!-- Animal Farm Q&A subtab -->
+    <div id="studyQA" style="display:none">
+      <div class="study-controls">
+        <input id="qaSearch" type="text" placeholder="Search questions/answers…" />
+        <button id="qaReset" class="btn secondary">Clear</button>
+        <button id="qaPrint" class="btn">Print</button>
+      </div>
+      <div id="qaList" style="max-height:60vh; overflow:auto;"></div>
+      <div class="small muted" style="margin-top:8px">Animal Farm – themes, plot & characters.</div>
+    </div>
   </section>
 </div>
 
@@ -446,7 +471,18 @@ $("milQuit").onclick=()=>{
 $("milStart").onclick=()=>{ buildLadder(); prepareGame(); };
 buildLadder();
 
-/* =========== STUDY ============ */
+/* =========== STUDY – SUBTABS, VOCAB TABLE & Q/A BANK ============ */
+/* Subtab toggles */
+document.querySelectorAll(".sub-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".sub-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const sub = btn.dataset.sub;
+    ["studyVocab","studyQA"].forEach(id => $(id).style.display = (id===sub) ? "" : "none");
+  });
+});
+
+/* Build Vocabulary table */
 function buildStudyTable(){
   const tb=$("studyTable").querySelector("tbody"); tb.innerHTML="";
   TERMS.forEach(t=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td><b>${t.w}</b></td><td>${t.d}</td><td><em>${t.e}</em></td>`; tb.appendChild(tr); });
@@ -458,7 +494,80 @@ function filterStudy(){
 $("studySearch").addEventListener("input", filterStudy);
 $("studyReset").onclick=()=>{ $("studySearch").value=""; filterStudy(); };
 $("studyPrint").onclick=()=>{ window.print(); };
+
+/* Animal Farm Q/A bank */
+const AF_QA = [
+  {q:"Who gives the speech that sparks the idea of rebellion?", a:"Old Major, an elderly boar, delivers a speech about animal equality and a future without human oppression."},
+  {q:"What does 'Beasts of England' symbolise in the novel?", a:"Hope and revolutionary zeal. It unites the animals with a common dream of freedom."},
+  {q:"Why do the pigs ban 'Beasts of England' later on?", a:"They claim the rebellion is complete and use a new hymn to redirect loyalty to Napoleon."},
+  {q:"Who is expelled from the farm and later blamed for many problems?", a:"Snowball. Napoleon uses him as a scapegoat to justify failures and clamp down on dissent."},
+  {q:"Which historical figures do Napoleon and Snowball represent?", a:"Napoleon represents Joseph Stalin; Snowball represents Leon Trotsky."},
+  {q:"What does Squealer represent and how?", a:"Propaganda. He manipulates language and statistics to justify Napoleon’s actions and rewrite history."},
+  {q:"What theme is shown by the pigs living in the farmhouse and wearing clothes?", a:"The corrupting nature of power and the betrayal of revolutionary ideals."},
+  {q:"What is Boxer's personal motto and what happens to him?", a:"'I will work harder' (later 'Napoleon is always right'). He is sold to the knacker when he becomes old and injured."},
+  {q:"What is the purpose of the windmill, originally?", a:"Snowball plans it to generate electricity to improve life; later it becomes a symbol of propaganda and profit."},
+  {q:"What causes the first windmill's collapse?", a:"A fierce storm, though Napoleon blames Snowball to maintain control."},
+  {q:"What do the dogs symbolise in Animal Farm?", a:"Napoleon’s secret police—state violence used to intimidate and eliminate opposition."},
+  {q:"How do the Seven Commandments change over time?", a:"They are subtly edited (e.g., 'with sheets') to excuse the pigs’ privileges, showing moral decline."},
+  {q:"What does Moses the raven and 'Sugarcandy Mountain' symbolise?", a:"Organised religion and the promise of a better afterlife used to pacify the oppressed."},
+  {q:"Explain the significance of the mass confessions and executions.", a:"They mirror totalitarian purges—instilling fear, eliminating dissent, and consolidating power."},
+  {q:"Why do the hens rebel and how are they punished?", a:"Their eggs are to be sold; they are starved until they submit."},
+  {q:"What is the meaning of the final commandment, '…some animals are more equal than others'?", a:"It exposes the hypocrisy of the regime and the complete betrayal of equality."},
+  {q:"What does the farmhouse come to represent?", a:"Privilege, hierarchy and the pigs’ assimilation into human behaviour and power."},
+  {q:"How do the sheep influence debates on the farm?", a:"By bleating slogans like 'Four legs good' (later 'two legs better') to drown out rational discussion."},
+  {q:"What is the significance of the final scene with the card game?", a:"Animals looking in cannot tell pigs from humans—power corrupts and rulers become indistinguishable."},
+  {q:"What does the green flag with hoof and horn symbolise initially?", a:"Animal unity and revolutionary ideals (paralleling political symbols like hammer and sickle)."},
+  {q:"How does Orwell use irony in Animal Farm?", a:"The revolution promises equality but ends in a dictatorship mimicking the old oppression."},
+  {q:"What role does literacy play among the animals?", a:"Pigs’ higher literacy lets them control information; other animals’ ignorance makes manipulation easier."},
+  {q:"How is fear used as a tool of control?", a:"Threat of the dogs, purges, and external enemies keeps animals obedient and silent."},
+  {q:"Why are outside humans reintroduced into the story?", a:"Trade and diplomacy show the pigs’ hypocrisy and their blending with the human elite."},
+  {q:"What theme is illustrated by rewriting history on the barn wall?", a:"Control of memory and truth—whoever controls the past controls the present."},
+  {q:"How is Benjamin important thematically?", a:"His cynicism and silence show the danger of apathy in the face of injustice."},
+  {q:"Why does Mollie leave the farm?", a:"She prioritises vanity and comfort (ribbons, sugar) over the duties of the revolution."},
+  {q:"What does the windmill finally produce and why is that important?", a:"Milled corn for profit; it shows the shift from improving lives to enriching the rulers."},
+  {q:"What is the narrative viewpoint of Animal Farm?", a:"A third-person objective style that often mirrors a fable, enhancing the allegory’s clarity."},
+  {q:"How does propaganda change the animals’ memories of Snowball?", a:"He’s recast as a traitor and coward, despite evidence of his heroism in the Battle of the Cowshed."}
+];
+
+/* Build Q/A list */
+function buildQAList(){
+  const wrap = $("qaList"); wrap.innerHTML="";
+  AF_QA.forEach((item, idx)=>{
+    const card = document.createElement("div"); card.className="qa-item";
+    card.innerHTML = `
+      <div class="qa-q">${idx+1}. ${item.q}</div>
+      <div class="qa-a">${item.a}</div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn secondary btnShow">Show Answer</button>
+      </div>
+    `;
+    const btn = card.querySelector(".btnShow");
+    const ans = card.querySelector(".qa-a");
+    btn.addEventListener("click", ()=>{
+      const visible = ans.style.display!=="none";
+      ans.style.display = visible ? "none" : "block";
+      btn.textContent = visible ? "Show Answer" : "Hide Answer";
+    });
+    wrap.appendChild(card);
+  });
+}
+
+/* Filter Q/A */
+function filterQA(){
+  const q = $("qaSearch").value.trim().toLowerCase();
+  [...$("qaList").children].forEach(div=>{
+    const text = div.textContent.toLowerCase();
+    div.style.display = text.includes(q) ? "" : "none";
+  });
+}
+
+$("qaSearch").addEventListener("input", filterQA);
+$("qaReset").onclick = ()=>{ $("qaSearch").value=""; filterQA(); };
+$("qaPrint").onclick = ()=>{ window.print(); };
+
+/* Init Study section */
 buildStudyTable();
+buildQAList();
 </script>
 </body>
 </html>
