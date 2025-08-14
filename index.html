@@ -7,8 +7,7 @@
 <style>
   :root{
     --bg:#0b132b; --panel:#121e36; --accent:#5bc0be; --accent2:#fca311;
-    --good:#2ecc71; --bad:#e74c3c; --text:#e6eef5;
-    --outline:#cfe7ff;
+    --good:#2ecc71; --bad:#e74c3c; --text:#e6eef5; --outline:#cfe7ff;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Inter,Roboto,Arial}
@@ -78,7 +77,7 @@
     </div>
   </header>
 
-  <!-- Hangman with stickman canvas -->
+  <!-- Hangman -->
   <section id="hangman" class="card">
     <div class="flex">
       <div class="grow" style="max-width:420px">
@@ -108,7 +107,6 @@
   <section id="seconds" class="card" style="display:none">
     <div class="row" style="justify-content:space-between;align-items:center">
       <div class="pill">Round Score: <span id="secScore">0</span></div>
-      <!-- Hourglass timer -->
       <div class="row" style="gap:10px;align-items:center">
         <svg id="hourglass" viewBox="0 0 100 160" class="hourglass" aria-label="Timer hourglass">
           <defs>
@@ -143,7 +141,7 @@
     <div class="mill-grid">
       <div>
         <div class="row" style="justify-content:space-between;align-items:center">
-          <div class="pill">Question <span id="milStep">1</span>/10</div>
+          <div class="pill">Question <span id="milStep">1</span>/15</div>
           <div class="lifelines">
             <button id="mil5050" class="btn secondary">50:50</button>
             <button id="milSkip" class="btn secondary">Skip</button>
@@ -183,7 +181,7 @@
 <div class="toast" id="toast">Saved</div>
 
 <script>
-/* --------- Tiny sound effects (offline, no files) ---------- */
+/* --------- Tiny sound effects (offline) ---------- */
 let AC;
 function beep(type="ok"){
   try{
@@ -240,167 +238,175 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   });
 });
 
-/* =============== HANGMAN (Stickman) ================= */
+/* =============== HANGMAN ================= */
 let hmWord="", hmMasked=[], hmLives=6, hmUsed=new Set(), hmHint="", hmWins=0;
-
-/* Canvas drawing */
-const cvs = $("hmCanvas");
-const ctx = cvs.getContext("2d");
-function drawGallows(){
-  ctx.clearRect(0,0,cvs.width,cvs.height);
-  ctx.strokeStyle = "#cfe7ff";
-  ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.moveTo(30,230); ctx.lineTo(170,230); ctx.stroke();          // base
-  ctx.beginPath(); ctx.moveTo(60,230); ctx.lineTo(60,40); ctx.lineTo(200,40);      // post/beam
-  ctx.lineTo(200,65); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(200,65); ctx.lineTo(200,85); ctx.stroke();           // rope
+const cvs = $("hmCanvas"), ctx = cvs.getContext("2d");
+function drawGallows(){ ctx.clearRect(0,0,cvs.width,cvs.height); ctx.strokeStyle="#cfe7ff"; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(30,230); ctx.lineTo(170,230); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(60,230); ctx.lineTo(60,40); ctx.lineTo(200,40); ctx.lineTo(200,65); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(200,65); ctx.lineTo(200,85); ctx.stroke(); }
+function drawStage(s){ ctx.strokeStyle="#fca311"; ctx.lineWidth=4;
+  if(s===1){ctx.beginPath(); ctx.arc(200,100,15,0,Math.PI*2); ctx.stroke();}
+  if(s===2){ctx.beginPath(); ctx.moveTo(200,115); ctx.lineTo(200,160); ctx.stroke();}
+  if(s===3){ctx.beginPath(); ctx.moveTo(200,125); ctx.lineTo(180,145); ctx.stroke();}
+  if(s===4){ctx.beginPath(); ctx.moveTo(200,125); ctx.lineTo(220,145); ctx.stroke();}
+  if(s===5){ctx.beginPath(); ctx.moveTo(200,160); ctx.lineTo(185,190); ctx.stroke();}
+  if(s===6){ctx.beginPath(); ctx.moveTo(200,160); ctx.lineTo(215,190); ctx.stroke();}
 }
-function drawStage(stage){
-  ctx.strokeStyle = "#fca311"; ctx.lineWidth = 4;
-  switch(stage){
-    case 1: ctx.beginPath(); ctx.arc(200,100,15,0,Math.PI*2); ctx.stroke(); break;         // head
-    case 2: ctx.beginPath(); ctx.moveTo(200,115); ctx.lineTo(200,160); ctx.stroke(); break;// body
-    case 3: ctx.beginPath(); ctx.moveTo(200,125); ctx.lineTo(180,145); ctx.stroke(); break;// L arm
-    case 4: ctx.beginPath(); ctx.moveTo(200,125); ctx.lineTo(220,145); ctx.stroke(); break;// R arm
-    case 5: ctx.beginPath(); ctx.moveTo(200,160); ctx.lineTo(185,190); ctx.stroke(); break;// L leg
-    case 6: ctx.beginPath(); ctx.moveTo(200,160); ctx.lineTo(215,190); ctx.stroke(); break;// R leg
-  }
-}
-function drawByMistakes(mistakes){ drawGallows(); for(let s=1; s<=mistakes && s<=6; s++) drawStage(s); }
-
-const drawKeyboard = ()=>{
-  const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-  const kb = $("keyboard"); kb.innerHTML="";
-  keys.forEach(k=>{
-    const btn=document.createElement("button");
-    btn.className="key"; btn.textContent=k;
-    btn.addEventListener("click", ()=>guess(k));
-    kb.appendChild(btn);
-  });
-};
-
-function newWord(){
-  const {w,d} = TERMS[Math.floor(Math.random()*TERMS.length)];
-  hmWord = w.toUpperCase(); hmHint = d;
-  hmMasked = hmWord.split("").map(ch=>/[A-Z]/.test(ch) ? "_" : ch);
-  hmLives = 6; hmUsed = new Set();
-  $("slots").textContent = hmMasked.join(" ");
-  $("lives").textContent = hmLives;
-  $("used").textContent = "Used: —";
-  $("hint").style.display="none";
-  $("hint").textContent = "Hint: " + hmHint;
-  $("result").textContent = "";
-  document.querySelectorAll(".key").forEach(k=>k.classList.remove("used"));
-  drawByMistakes(0);
-}
-function reveal(){ $("slots").textContent = hmWord.split("").join(" "); $("result").innerHTML = `Answer: <b>${hmWord}</b>`; }
+function drawByMistakes(m){ drawGallows(); for(let i=1;i<=m && i<=6;i++) drawStage(i); }
+const drawKeyboard=()=>{ const kb=$("keyboard"); kb.innerHTML=""; "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(k=>{const b=document.createElement("button"); b.className="key"; b.textContent=k; b.onclick=()=>guess(k); kb.appendChild(b);});};
+function newWord(){ const {w,d}=TERMS[Math.floor(Math.random()*TERMS.length)];
+  hmWord=w.toUpperCase(); hmHint=d; hmMasked=hmWord.split("").map(ch=>/[A-Z]/.test(ch)?"_":ch);
+  hmLives=6; hmUsed=new Set(); $("slots").textContent=hmMasked.join(" "); $("lives").textContent=hmLives; $("used").textContent="Used: —";
+  $("hint").style.display="none"; $("hint").textContent="Hint: "+hmHint; $("result").textContent=""; document.querySelectorAll(".key").forEach(k=>k.classList.remove("used")); drawByMistakes(0); }
+function reveal(){ $("slots").textContent=hmWord.split("").join(" "); $("result").innerHTML=`Answer: <b>${hmWord}</b>`; }
 function guess(letter){
-  if(hmLives<=0) return;
-  if(hmUsed.has(letter)) return;
-  hmUsed.add(letter);
-  document.querySelectorAll(".key").forEach(k=>{ if(k.textContent===letter) k.classList.add("used"); });
-  $("used").textContent = "Used: " + [...hmUsed].join(" ");
-
-  if(hmWord.includes(letter)){
-    hmWord.split("").forEach((ch,i)=>{ if(ch===letter) hmMasked[i]=letter; });
-    $("slots").textContent = hmMasked.join(" ");
-    beep("ok");
-    if(!hmMasked.includes("_")){
-      $("result").innerHTML = `<span class="good">Great! You solved it.</span>`;
-      hmWins++; $("wins").textContent = hmWins; beep("win"); toast("Win +1");
-    }
-  }else{
-    hmLives--; $("lives").textContent = hmLives;
-    const mistakes = 6 - hmLives; drawByMistakes(mistakes); beep("wrong");
-    if(hmLives<=0){ $("result").innerHTML = `<span class="bad">Out of lives!</span> The word was <b>${hmWord}</b>.`; beep("lose"); toast("Round over"); }
-  }
+  if(hmLives<=0||hmUsed.has(letter)) return;
+  hmUsed.add(letter); document.querySelectorAll(".key").forEach(k=>{if(k.textContent===letter) k.classList.add("used");});
+  $("used").textContent="Used: "+[...hmUsed].join(" ");
+  if(hmWord.includes(letter)){ hmWord.split("").forEach((ch,i)=>{if(ch===letter) hmMasked[i]=letter;}); $("slots").textContent=hmMasked.join(" "); beep("ok");
+    if(!hmMasked.includes("_")){ $("result").innerHTML=`<span class="good">Great! You solved it.</span>`; hmWins++; $("wins").textContent=hmWins; beep("win"); toast("Win +1"); }
+  }else{ hmLives--; $("lives").textContent=hmLives; drawByMistakes(6-hmLives); beep("wrong");
+    if(hmLives<=0){ $("result").innerHTML=`<span class="bad">Out of lives!</span> The word was <b>${hmWord}</b>.`; beep("lose"); toast("Round over"); } }
 }
 drawKeyboard(); newWord();
-$("btnHint").onclick = ()=>{ $("hint").style.display = $("hint").style.display==="none"?"":"none"; };
-$("btnNew").onclick = ()=>{ newWord(); };
-$("btnReveal").onclick = ()=>{ reveal(); };
-window.addEventListener("keydown",(e)=>{ if($("hangman").style.display==="none") return; const L=e.key.toUpperCase(); if(L>="A"&&L<="Z") guess(L); });
+$("btnHint").onclick=()=>{$("hint").style.display=$("hint").style.display==="none"?"": "none";};
+$("btnNew").onclick=()=>newWord();
+$("btnReveal").onclick=()=>reveal();
+window.addEventListener("keydown",e=>{ if($("hangman").style.display==="none") return; const L=e.key.toUpperCase(); if(L>="A"&&L<="Z") guess(L); });
 
-/* =========== 30 SECONDS (Definitions) ============ */
+/* =========== 30 SECONDS ============ */
 let secRoundActive=false, secTime=30, secTimer=null, secScore=0, secTotal=0, secQueue=[], secCurrent=null;
 const secDuration=30;
-function updateHourglass(){
-  const HG=60, prog=1-(secTime/secDuration), topH=(1-prog)*HG, bottomH=prog*HG;
-  $("hgTop").setAttribute("height", topH.toFixed(2));
-  $("hgBottom").setAttribute("y", (140-bottomH).toFixed(2));
-  $("hgBottom").setAttribute("height", bottomH.toFixed(2));
-  const stream=$("hgStream");
-  if(secRoundActive && secTime>0 && secTime<secDuration){
-    const len=8+34*prog; stream.setAttribute("y",(80-len).toFixed(2)); stream.setAttribute("height",len.toFixed(2)); stream.setAttribute("visibility","visible");
-  }else{ stream.setAttribute("visibility","hidden"); }
-}
-function secondsReset(){
-  secRoundActive=false; secTime=secDuration; secScore=0; secQueue=shuffle(TERMS.slice()); secCurrent=null; clearInterval(secTimer);
+function updateHourglass(){ const HG=60, prog=1-(secTime/secDuration), topH=(1-prog)*HG, bottomH=prog*HG;
+  $("hgTop").setAttribute("height", topH.toFixed(2)); $("hgBottom").setAttribute("y", (140-bottomH).toFixed(2)); $("hgBottom").setAttribute("height", bottomH.toFixed(2));
+  const stream=$("hgStream"); if(secRoundActive&&secTime>0&&secTime<secDuration){ const len=8+34*prog; stream.setAttribute("y",(80-len).toFixed(2)); stream.setAttribute("height",len.toFixed(2)); stream.setAttribute("visibility","visible"); }
+  else stream.setAttribute("visibility","hidden"); }
+function secondsReset(){ secRoundActive=false; secTime=secDuration; secScore=0; secQueue=shuffle(TERMS.slice()); secCurrent=null; clearInterval(secTimer);
   $("secTime").textContent=secTime; $("secScore").textContent=0; $("secFeedback").textContent=""; $("secInput").value="";
-  $("secInput").disabled=true; $("secSkip").disabled=true; $("secGive").disabled=true;
-  $("defBox").innerHTML="Press <b>Start 30-second Round</b> to begin."; updateHourglass();
-}
+  $("secInput").disabled=true; $("secSkip").disabled=true; $("secGive").disabled=true; $("defBox").innerHTML="Press <b>Start 30-second Round</b> to begin."; updateHourglass(); }
 function nextDefinition(){ if(secQueue.length===0) secQueue=shuffle(TERMS.slice()); secCurrent=secQueue.pop(); $("defBox").innerHTML=`<b>Definition:</b> ${secCurrent.d}`; $("secInput").value=""; $("secInput").focus(); }
-function startRound(){
-  if(secRoundActive) return;
-  secondsReset(); secRoundActive=true; $("secInput").disabled=false; $("secSkip").disabled=false; $("secGive").disabled=false; nextDefinition();
-  secTimer=setInterval(()=>{ secTime--; $("secTime").textContent=secTime; updateHourglass(); if(secTime<=0){ endRound(); beep("time"); } },1000);
-}
+function startRound(){ if(secRoundActive) return; secondsReset(); secRoundActive=true; $("secInput").disabled=false; $("secSkip").disabled=false; $("secGive").disabled=false; nextDefinition();
+  secTimer=setInterval(()=>{ secTime--; $("secTime").textContent=secTime; updateHourglass(); if(secTime<=0){ endRound(); beep("time"); } },1000); }
 function endRound(){ clearInterval(secTimer); secRoundActive=false; $("secInput").disabled=true; $("secSkip").disabled=true; $("secGive").disabled=true;
   $("secFeedback").innerHTML=`⏱️ Round over. You scored <b>${secScore}</b>.`; $("secLast").innerHTML=""; toast("Round finished"); updateHourglass(); }
 $("secStart").onclick=startRound;
 $("secSkip").onclick=()=>{ if(!secRoundActive) return; $("secLast").innerHTML=`Skipped: <b>${secCurrent.w}</b>`; nextDefinition(); };
 $("secGive").onclick=()=>{ if(!secRoundActive) return; $("secLast").innerHTML=`Answer: <b>${secCurrent.w}</b>`; nextDefinition(); };
-$("secInput").addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ const g=e.target.value.trim().toLowerCase(); if(!g) return;
-  if(g===secCurrent.w.toLowerCase()){ secScore++; secTotal++; $("secScore").textContent=secScore; $("secTotal").textContent=secTotal; $("secFeedback").innerHTML=`<span class="good">Correct!</span>`; beep("ok"); nextDefinition();
-  }else{ $("secFeedback").innerHTML=`<span class="bad">Try again.</span>`; beep("wrong"); } } });
+$("secInput").addEventListener("keydown",e=>{ if(e.key==="Enter"){ const g=e.target.value.trim().toLowerCase(); if(!g) return;
+  if(g===secCurrent.w.toLowerCase()){ secScore++; secTotal++; $("secScore").textContent=secScore; $("secTotal").textContent=secTotal; $("secFeedback").innerHTML=`<span class="good">Correct!</span>`; beep("ok"); nextDefinition(); }
+  else { $("secFeedback").innerHTML=`<span class="bad">Try again.</span>`; beep("wrong"); } } });
 secondsReset();
 
-/* =========== MILLIONAIRE ============ */
-const ladderValues = ["R 1 000 000","R 500 000","R 250 000","R 125 000","R 64 000","R 32 000","R 16 000","R 8 000","R 4 000","R 2 000"];
+/* =========== MILLIONAIRE (15-step ladder; 50-question bank; uses 15 per game) ============ */
+const ladderValues=[
+  "R 1 000 000","R 500 000","R 250 000","R 125 000","R 64 000",
+  "R 32 000","R 16 000","R 8 000","R 4 000","R 2 000",
+  "R 1 000","R 500","R 300","R 200","R 100"
+];
 let milIndex=0, milUsed5050=false, milUsedSkip=false, milActive=false, milQSet=[];
+
+/* 50-question bank (Animal Farm + Vocabulary) */
+const QUESTION_BANK = [
+  // --- Animal Farm (themes/plot/characters)
+  {q:"In Animal Farm, which old boar first inspires the rebellion with his speech?", options:["Old Major","Napoleon","Snowball","Squealer"], correct:"Old Major"},
+  {q:"What song does Old Major teach the animals?", options:["Beasts of England","Comrade Napoleon","Animals Unite","The Green Flag"], correct:"Beasts of England"},
+  {q:"Which pig is driven off the farm by Napoleon's dogs?", options:["Snowball","Squealer","Minimus","Moses"], correct:"Snowball"},
+  {q:"Napoleon in the novel most closely represents which historical figure?", options:["Joseph Stalin","Vladimir Lenin","Adolf Hitler","Winston Churchill"], correct:"Joseph Stalin"},
+  {q:"Snowball most closely represents which historical figure?", options:["Leon Trotsky","Joseph Stalin","Tsar Nicholas II","Karl Marx"], correct:"Leon Trotsky"},
+  {q:"Squealer primarily symbolises which force?", options:["Propaganda","Education","Religion","Industry"], correct:"Propaganda"},
+  {q:"Which hardworking cart-horse repeats the maxim 'I will work harder'?", options:["Boxer","Clover","Benjamin","Mollie"], correct:"Boxer"},
+  {q:"What ultimately happens to Boxer?", options:["He is sold to the knacker","He retires peacefully","He escapes to Foxwood","He becomes a leader"], correct:"He is sold to the knacker"},
+  {q:"The first battle when Mr Jones tries to retake the farm is called the…", options:["Battle of the Cowshed","Battle of the Windmill","Battle of the Barn","Battle of Pinchfield"], correct:"Battle of the Cowshed"},
+  {q:"What was Snowball's main plan for the windmill?", options:["To generate electricity","To store grain","To be a lookout tower","To be a monument to Old Major"], correct:"To generate electricity"},
+  {q:"Which farmer pays with forged banknotes for the timber?", options:["Mr Frederick","Mr Pilkington","Mr Jones","Mr Whymper"], correct:"Mr Frederick"},
+  {q:"Moses the raven represents which idea?", options:["Religion and hope of Sugarcandy Mountain","Education and literacy","Law and order","Militarism"], correct:"Religion and hope of Sugarcandy Mountain"},
+  {q:"Which animal loves ribbons and sugar lumps and later leaves the farm?", options:["Mollie","Clover","Muriel","The Cat"], correct:"Mollie"},
+  {q:"Which hymn eventually replaces 'Beasts of England'?", options:["Comrade Napoleon","Four Legs Good","Green Banner","Animal Farm Forever"], correct:"Comrade Napoleon"},
+  {q:"How does the final commandment read at the end of the novel?", options:["All animals are equal, but some animals are more equal than others","All animals are equal","No animal shall drink alcohol","Two legs bad, four legs good"], correct:"All animals are equal, but some animals are more equal than others"},
+  {q:"The farm's flag is green and originally bears which symbols?", options:["Hoof and horn","Hammer and sickle","Plough and sword","Star and stripe"], correct:"Hoof and horn"},
+  {q:"Which animal is the cynical donkey who can read and rarely laughs?", options:["Benjamin","Boxer","Muriel","Clover"], correct:"Benjamin"},
+  {q:"Napoleon raises which animals to act as his secret police?", options:["The dogs","The sheep","The pigs","The hens"], correct:"The dogs"},
+  {q:"Why do the hens rebel under Napoleon?", options:["Their eggs are to be sold for trade","They must work at night","Their food is cut permanently","They are forced to migrate"], correct:"Their eggs are to be sold for trade"},
+  {q:"Which goat can read well and often reads the commandments to the others?", options:["Muriel","Mollie","Clover","Jessie"], correct:"Muriel"},
+  {q:"What does the farmhouse come to symbolise?", options:["The pigs' privilege and power","Equality among animals","The failure of agriculture","A place of education"], correct:"The pigs' privilege and power"},
+  {q:"What happens during the mass 'confessions' later in the novel?", options:["Animals are executed by the dogs","Animals are exiled to other farms","Humans are arrested","The barn is burned"], correct:"Animals are executed by the dogs"},
+  {q:"Who acts as go-between for Animal Farm and the outside world?", options:["Mr Whymper","Mr Frederick","Mr Pilkington","Mr Jones"], correct:"Mr Whymper"},
+  {q:"What actually causes the first windmill to collapse?", options:["A violent storm","Snowball's sabotage","A human attack","Weak timber from Foxwood"], correct:"A violent storm"},
+  {q:"By the end, what slogan do the sheep bleat to support the pigs?", options:["Four legs good, two legs better!","Four legs good, two legs bad!","Long live Animal Farm!","Napoleon is always right!"], correct:"Four legs good, two legs better!"},
+  {q:"At the very end, Animal Farm is renamed…", options:["Manor Farm","Napoleon Farm","The Republic of Animals","Foxwood"], correct:"Manor Farm"},
+  {q:"Which pig writes poems and songs praising Napoleon?", options:["Minimus","Squealer","Snowball","Muriel"], correct:"Minimus"},
+  {q:"Mr Pilkington is the owner of which neighbouring farm?", options:["Foxwood","Pinchfield","Manor Farm","Sugarcandy"], correct:"Foxwood"},
+  {q:"Which theme is best shown by the pigs slowly taking human privileges?", options:["The corrupting nature of power","The beauty of nature","The value of sports","The benefits of isolation"], correct:"The corrupting nature of power"},
+  {q:"Which technique does Squealer most rely on to control opinion?", options:["Propaganda and manipulation of language","Fair elections","Physical labour","Religious sermons"], correct:"Propaganda and manipulation of language"},
+  {q:"Why is 'Beasts of England' banned?", options:["The rebellion is said to be complete","The tune is too difficult","Humans demand it","Animals forget the words"], correct:"The rebellion is said to be complete"},
+  {q:"How are the rebelling hens punished?", options:["They are starved until they give in","They are sold to another farm","Their combs are cut off","They are made to plough fields"], correct:"They are starved until they give in"},
+  {q:"Which animal notices the commandments changing but stays silent?", options:["Benjamin","Clover","Boxer","Moses"], correct:"Benjamin"},
+  {q:"Eventually, what is the windmill used for instead of electricity?", options:["Milling corn for profit","Pumping water for fields","Heating the stalls","Powering lights in the barn"], correct:"Milling corn for profit"},
+  {q:"After Snowball is expelled, who is blamed for most problems?", options:["Snowball","Mr Jones","Benjamin","Mr Whymper"], correct:"Snowball"},
+  {q:"Which character best represents the easily-led masses who follow simple slogans?", options:["The sheep","The dogs","Clover","Muriel"], correct:"The sheep"},
+  {q:"Which human owner is friendly at the end when the pigs host a dinner?", options:["Mr Pilkington","Mr Frederick","Mr Jones","Mr Whymper"], correct:"Mr Pilkington"},
+  {q:"Which commandment is altered to read 'No animal shall sleep in a bed with sheets'?", options:["No animal shall sleep in a bed","No animal shall kill any other animal","No animal shall wear clothes","No animal shall drink alcohol"], correct:"No animal shall sleep in a bed"},
+  {q:"Which trait best describes Boxer?", options:["Loyal and hardworking","Clever and sly","Greedy and vain","Lazy but kind"], correct:"Loyal and hardworking"},
+  {q:"Which animal is motherly and often cares for the ducklings?", options:["Clover","Mollie","Muriel","Cat"], correct:"Clover"},
+  {q:"What object do the pigs eventually carry that shows their full transformation?", options:["Whips","Books","Keys","Lanterns"], correct:"Whips"},
+  {q:"Which phrase does Boxer add to his maxims later in the novel?", options:["Napoleon is always right","Power to the animals","Pigs know best","For the windmill!"], correct:"Napoleon is always right"},
+  {q:"Who first owns Manor Farm before the rebellion?", options:["Mr Jones","Mr Frederick","Mr Pilkington","Mr Whymper"], correct:"Mr Jones"},
+  {q:"Which character represents organised religion promising rewards after death?", options:["Moses","Minimus","Muriel","Cat"], correct:"Moses"},
+  {q:"What does the final card game between pigs and humans symbolise?", options:["Corrupt alliances and indistinguishable rulers","Return to equality","End of trade","Beginning of a new rebellion"], correct:"Corrupt alliances and indistinguishable rulers"},
+  // --- Vocabulary (from the list)
+  {q:'Which word means "The restoration of friendly relations"?', options:["Reconciliation","Justice","Dialogue","Truth"], correct:"Reconciliation"},
+  {q:'A system of institutionalised racial segregation is called…', options:["Apartheid","Exile","Repression","Legacy"], correct:"Apartheid"},
+  {q:'Which word means "Freedom from oppression"?', options:["Liberation","Respect","Identity","Funeral"], correct:"Liberation"},
+  {q:'"The action of forgiving someone for a mistake" defines…', options:["Forgiveness","Honesty","Reconciliation","Sacrifice"], correct:"Forgiveness"},
+  {q:'"The action of subduing someone by force" defines…', options:["Repression","Conflict","Responsibility","Justice"], correct:"Repression"},
+  {q:'Bitter indignation at being treated unfairly is…', options:["Resentment","Tension","Betrayal","Legacy"], correct:"Resentment"},
+  {q:'Disloyalty or treachery is…', options:["Betrayal","Honesty","Respect","Dialogue"], correct:"Betrayal"},
+  {q:'Mental or emotional strain is…', options:["Tension","Conflict","Identity","Exile"], correct:"Tension"},
+  {q:'A duty to deal with something or someone is…', options:["Responsibility","Justice","Respect","Truth"], correct:"Responsibility"},
+  {q:'Fair treatment or behaviour is…', options:["Justice","Forgiveness","Dialogue","Legacy"], correct:"Justice"},
+  {q:'A conversation between two or more people is…', options:["Dialogue","Sacrifice","Truth","Funeral"], correct:"Dialogue"},
+  {q:'Giving something up for a cause or others is…', options:["Sacrifice","Reconciliation","Apartheid","Exile"], correct:"Sacrifice"},
+  {q:'Who someone is; the sense of self is…', options:["Identity","Respect","Honesty","Legacy"], correct:"Identity"},
+  {q:'Being truthful and sincere is…', options:["Honesty","Betrayal","Tension","Responsibility"], correct:"Honesty"},
+  {q:'What is left behind or remembered is…', options:["Legacy","Sacrifice","Reconciliation","Exile"], correct:"Legacy"}
+];
+
+/* Ladder UI */
 function buildLadder(){
   const ul=$("milLadder"); ul.innerHTML="";
-  ladderValues.forEach((val,i)=>{
-    const li=document.createElement("li"); const step=ladderValues.length-i;
-    li.innerHTML=`<span>${step}</span><span>${val}</span>`; ul.appendChild(li);
-  });
+  ladderValues.forEach((val,i)=>{ const li=document.createElement("li"); const step=ladderValues.length-i; li.innerHTML=`<span>${step}</span><span>${val}</span>`; ul.appendChild(li); });
 }
 function highlightLadder(){
   const items=[...$("milLadder").children]; items.forEach(li=>li.classList.remove("active"));
-  const pos = ladderValues.length - milIndex; if(items[pos-1]) items[pos-1].classList.add("active");
+  const pos=ladderValues.length - milIndex; if(items[pos-1]) items[pos-1].classList.add("active");
 }
-function makeQuestion(){
-  // Pick a random term, build 4 options
-  const correct = TERMS[Math.floor(Math.random()*TERMS.length)];
-  const others = shuffle(TERMS.filter(t=>t!==correct)).slice(0,3);
-  const opts = shuffle([correct, ...others]).map(t=>t.w);
-  return {q:`Which word matches the definition:<br><em>“${correct.d}”</em>`, correct: correct.w, options: opts};
-}
+
+/* Game flow */
 function prepareGame(){
   milIndex=0; milUsed5050=false; milUsedSkip=false; milActive=false; $("milFeedback").textContent=""; $("milStep").textContent="1";
   $("mil5050").disabled=false; $("milSkip").disabled=false;
-  milQSet = Array.from({length:10}, makeQuestion);
+  milQSet = shuffle(QUESTION_BANK).slice(0,15); // 15 Qs per game
   renderQuestion();
 }
 function renderQuestion(){
-  const q = milQSet[milIndex];
-  $("milQ").innerHTML = q.q;
-  const wrap = $("milOpts"); wrap.innerHTML="";
+  const q=milQSet[milIndex];
+  $("milQ").innerHTML=q.q;
+  const wrap=$("milOpts"); wrap.innerHTML="";
   q.options.forEach((opt,i)=>{
-    const btn=document.createElement("button");
-    btn.innerHTML = `<span style="opacity:.8"> ${String.fromCharCode(65+i)} ) </span> ${opt}`;
-    btn.onclick = ()=> checkAnswer(btn, opt);
-    wrap.appendChild(btn);
+    const b=document.createElement("button");
+    b.dataset.opt=opt; // store exact text
+    b.innerHTML=`<span style="opacity:.8">${String.fromCharCode(65+i)})</span> ${opt}`;
+    b.onclick=()=>checkAnswer(b,opt);
+    wrap.appendChild(b);
   });
   highlightLadder();
 }
 function checkAnswer(button, choice){
   if(!milActive) milActive=true;
-  const q = milQSet[milIndex];
-  const buttons=[...$("milOpts").querySelectorAll("button")];
+  const q=milQSet[milIndex], buttons=[...$("milOpts").querySelectorAll("button")];
   buttons.forEach(b=>b.disabled=true);
-  if(choice===q.correct){
+  if(choice.toLowerCase()===q.correct.toLowerCase()){
     button.classList.add("right"); beep("ok");
     setTimeout(()=>{
       milIndex++;
@@ -408,59 +414,50 @@ function checkAnswer(button, choice){
         $("milFeedback").innerHTML=`🏆 <span class="good">Congratulations!</span> You reached <b>${ladderValues[0]}</b>.`;
         beep("win"); milActive=false;
       }else{
-        $("milStep").textContent = String(milIndex+1);
+        $("milStep").textContent=String(milIndex+1);
         renderQuestion(); buttons.forEach(b=>b.classList.remove("right"));
       }
     },500);
   }else{
     button.classList.add("wrong"); beep("wrong");
-    const idx = q.options.indexOf(q.correct);
-    const correctBtn = buttons[idx]; correctBtn.classList.add("right");
+    const correctBtn = buttons.find(b=>b.dataset.opt.toLowerCase()===q.correct.toLowerCase());
+    if(correctBtn) correctBtn.classList.add("right");
     $("milFeedback").innerHTML=`❌ <span class="bad">Incorrect.</span> Correct answer: <b>${q.correct}</b>.`;
     milActive=false; beep("lose");
   }
 }
-$("mil5050").onclick = ()=>{
+/* Lifelines */
+$("mil5050").onclick=()=>{
   if(milUsed5050) return; milUsed5050=true; $("mil5050").disabled=true;
-  const q = milQSet[milIndex];
-  const buttons=[...$("milOpts").querySelectorAll("button")];
-  const wrongs = buttons.filter(b=>!b.textContent.toLowerCase().includes(q.correct.toLowerCase()));
+  const q=milQSet[milIndex], buttons=[...$("milOpts").querySelectorAll("button")];
+  const wrongs=buttons.filter(b=>b.dataset.opt.toLowerCase()!==q.correct.toLowerCase());
   shuffle(wrongs).slice(0,2).forEach(b=>{ b.disabled=true; b.style.opacity=.4; });
 };
-$("milSkip").onclick = ()=>{
+$("milSkip").onclick=()=>{
   if(milUsedSkip) return; milUsedSkip=true; $("milSkip").disabled=true;
   milIndex++; if(milIndex>=milQSet.length){ $("milFeedback").innerHTML=`You skipped to the end. Final: <b>${ladderValues[0]}</b>.`; milActive=false; return; }
-  $("milStep").textContent = String(milIndex+1); renderQuestion();
+  $("milStep").textContent=String(milIndex+1); renderQuestion();
 };
-$("milQuit").onclick = ()=>{
-  const prizeIndex = Math.max(ladderValues.length - milIndex, 1);
-  $("milFeedback").innerHTML = `👋 You quit with <b>${ladderValues[prizeIndex-1]}</b>.`;
+$("milQuit").onclick=()=>{
+  const prizeIndex=Math.max(ladderValues.length-milIndex,1);
+  $("milFeedback").innerHTML=`👋 You quit with <b>${ladderValues[prizeIndex-1]}</b>.`;
   milActive=false;
 };
-$("milStart").onclick = ()=>{ buildLadder(); prepareGame(); };
-
+$("milStart").onclick=()=>{ buildLadder(); prepareGame(); };
 buildLadder();
 
 /* =========== STUDY ============ */
 function buildStudyTable(){
-  const tb = $("studyTable").querySelector("tbody"); tb.innerHTML="";
-  TERMS.forEach(t=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML = `<td><b>${t.w}</b></td><td>${t.d}</td><td><em>${t.e}</em></td>`;
-    tb.appendChild(tr);
-  });
+  const tb=$("studyTable").querySelector("tbody"); tb.innerHTML="";
+  TERMS.forEach(t=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td><b>${t.w}</b></td><td>${t.d}</td><td><em>${t.e}</em></td>`; tb.appendChild(tr); });
 }
 function filterStudy(){
-  const q = $("studySearch").value.trim().toLowerCase();
-  const rows=[...$("studyTable").querySelectorAll("tbody tr")];
-  rows.forEach(r=>{
-    const text=r.textContent.toLowerCase();
-    r.style.display = text.includes(q) ? "" : "none";
-  });
+  const q=$("studySearch").value.trim().toLowerCase();
+  [...$("studyTable").querySelectorAll("tbody tr")].forEach(r=>{ r.style.display=r.textContent.toLowerCase().includes(q)?"":"none"; });
 }
 $("studySearch").addEventListener("input", filterStudy);
-$("studyReset").onclick = ()=>{ $("studySearch").value=""; filterStudy(); };
-$("studyPrint").onclick = ()=>{ window.print(); };
+$("studyReset").onclick=()=>{ $("studySearch").value=""; filterStudy(); };
+$("studyPrint").onclick=()=>{ window.print(); };
 buildStudyTable();
 </script>
 </body>
